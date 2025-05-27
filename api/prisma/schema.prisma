@@ -1,0 +1,29 @@
+// api/prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // For local development with SQLite
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String   // Storing hashed passwords
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tasks     Task[]   // A user can have many tasks
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?  // Optional description
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      Int      // Foreign key to User
+  user        User     @relation(fields: [userId], references: [id])
+}
