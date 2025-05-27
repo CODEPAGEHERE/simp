@@ -1,0 +1,101 @@
+
+.simp-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 3rem; /* Adjust padding for desktop */
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  opacity: 0; /* Hidden by default, will animate in */
+  animation: fadeInDown 1s forwards 0.5s; /* Animation for fade-in */
+}
+
+/* Hide navbar elements on mobile by default */
+.simp-navbar .simp-navbar-nav,
+.simp-navbar .simp-navbar-auth {
+  display: none;
+}
+
+.simp-navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.simp-navbar-brand a {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  color: #333;
+}
+
+.simp-navbar-brand .logo-icon {
+  width: 28px; /* Adjust size as needed */
+  height: 28px;
+  margin-right: 8px;
+}
+
+.simp-navbar-brand .logo-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.simp-navbar-nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex; /* Display on desktop */
+  gap: 2.5rem; /* Space between nav items */
+}
+
+.simp-navbar-nav li a {
+  text-decoration: none;
+  color: #555;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.simp-navbar-nav li a:hover {
+  color: #007bff; /* Primary blue on hover */
+}
+
+.simp-btn-signup {
+  padding: 0.6rem 1.5rem;
+  border-radius: 20px; /* Pill shape */
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 1px solid #333; /* Darker border for signup button */
+  color: #333;
+}
+
+.simp-btn-signup:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+/* --- Animations (reusing from App.css or define here for Navbar specific) --- */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* --- Media Queries for Desktop (min-width) --- */
+@media (min-width: 992px) { /* Adjust breakpoint as needed, e.g., 768px for tablet */
+  .simp-navbar {
+    padding: 1.5rem 5rem; /* Larger padding for wider screens */
+  }
+
+  .simp-navbar .simp-navbar-nav,
+  .simp-navbar .simp-navbar-auth {
+    display: flex; /* Show these elements on desktop */
+  }
+}
