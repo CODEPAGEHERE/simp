@@ -1,22 +1,27 @@
 
+/* =========================================== */
+/* --- DESKTOP FIRST STYLES (DEFAULT) ---  */
+/* These styles apply to larger screens by default. */
+/* =========================================== */
+
 .simp-navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 3rem; /* Adjust padding for desktop */
-  border-bottom: 1px solid #eee;
-  background-color: #fff;
+  border-bottom: 2px solid black;
   position: sticky;
   top: 0;
   z-index: 1000;
-  opacity: 0; /* Hidden by default, will animate in */
-  animation: fadeInDown 1s forwards 0.5s; /* Animation for fade-in */
+  padding: 1.5rem 0; /* No horizontal padding on the outer navbar itself */
+  opacity: 0;
+  animation: fadeInDown 1s forwards 0.5s;
+  margin-left: 200px;
+  margin-right: 200px;
+  height:70px; 
 }
 
-/* Hide navbar elements on mobile by default */
-.simp-navbar .simp-navbar-nav,
-.simp-navbar .simp-navbar-auth {
-  display: none;
+.simp-navbar-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* Will fill the space constrained by .simp-navbar margins */
 }
 
 .simp-navbar-brand {
@@ -32,48 +37,65 @@
 }
 
 .simp-navbar-brand .logo-icon {
-  width: 28px; /* Adjust size as needed */
+  width: 28px;
   height: 28px;
   margin-right: 8px;
 }
 
 .simp-navbar-brand .logo-text {
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 500;
+  margin-right:100px;
 }
 
+/* --- Desktop Navigation Links --- */
 .simp-navbar-nav {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex; /* Display on desktop */
+  display: flex; /* Horizontal layout by default (desktop) */
   gap: 2.5rem; /* Space between nav items */
 }
 
 .simp-navbar-nav li a {
   text-decoration: none;
   color: #555;
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 400;
   transition: color 0.3s ease;
+  padding: 0; /* No padding needed for desktop links */
 }
 
 .simp-navbar-nav li a:hover {
-  color: #007bff; /* Primary blue on hover */
+  color: #007bff;
+}
+
+/* --- Desktop Signup Button --- */
+.simp-navbar-auth {
+  display: block; /* Show desktop signup button by default */
 }
 
 .simp-btn-signup {
   padding: 0.6rem 1.5rem;
-  border-radius: 20px; /* Pill shape */
+  border-radius: 80px !important ;
   font-weight: 600;
   transition: all 0.3s ease;
-  border: 1px solid #333; /* Darker border for signup button */
+  border: 1px solid #333;
   color: #333;
 }
 
 .simp-btn-signup:hover {
   background-color: #333;
   color: #fff;
+}
+
+/* Hide mobile-specific elements on desktop by default */
+.hamburger-menu-button {
+  display: none;
+}
+
+.simp-navbar-nav .mobile-auth-item {
+  display: none;
 }
 
 /* --- Animations (reusing from App.css or define here for Navbar specific) --- */
@@ -88,14 +110,155 @@
   }
 }
 
-/* --- Media Queries for Desktop (min-width) --- */
-@media (min-width: 992px) { /* Adjust breakpoint as needed, e.g., 768px for tablet */
+/* ========================================= */
+/* --- MOBILE STYLES (MAX-WIDTH MEDIA QUERY) --- */
+/* ========================================= */
+@media (max-width: 991px) {
+
   .simp-navbar {
-    padding: 1.5rem 5rem; /* Larger padding for wider screens */
+    margin-left: 0;
+    margin-right: 0;
+    border-bottom: none; /* Removed border-bottom on mobile */
+    padding: 1rem 1.5rem;
+    position: relative;
+    overflow: visible;
+    z-index: 1000;
   }
 
-  .simp-navbar .simp-navbar-nav,
-  .simp-navbar .simp-navbar-auth {
-    display: flex; /* Show these elements on desktop */
+  .simp-navbar-inner {
+    flex-direction: row-reverse; /* Reverses the order (hamburger left, brand right) */
+    justify-content: space-between; /* Keeps hamburger and brand strictly on ends */
+    align-items: center; /* Vertically centers them */
+  }
+
+  /* --- Mobile Logo Adjustments --- */
+  .simp-navbar-brand .logo-icon {
+    width: 24px; /* Reduced logo icon size */
+    height: 24px; /* Reduced logo icon size */
+    margin-right: 0; /* Remove margin if text is hidden */
+  }
+
+  .simp-navbar-brand .logo-text {
+    display: none; /* Hide the logo text on mobile */
+  }
+
+  /* --- Hamburger Menu Button (Mobile Only) --- */
+  .hamburger-menu-button {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 25px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1003;
+  }
+
+  .hamburger-line {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: #333;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* Hamburger to X animation */
+  .hamburger-menu-button.active .hamburger-line:nth-child(1) {
+    transform: translateY(11px) rotate(45deg);
+  }
+  .hamburger-menu-button.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger-menu-button.active .hamburger-line:nth-child(3) {
+    transform: translateY(-11px) rotate(-45deg);
+  }
+
+  /* Hide desktop nav and auth elements on mobile */
+  .simp-navbar-nav:not(.open),
+  .simp-navbar-auth {
+    display: none;
+  }
+
+  /* Mobile Navigation Dropdown (Activated by .open class) */
+  .simp-navbar-nav {
+    list-style: none;
+    margin: 0;
+    padding: 20px;
+    position: absolute;
+    top: 100%; /* Position right below the navbar */
+    left: 0;
+    width: 100%;
+    background-color: #fff;
+    flex-direction: column;
+    /* align-items: center; Removed: Will align items left now */
+    gap: 10px; /* Reduced gap between list items */
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    transform: translateY(-10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out, visibility 0.3s;
+    z-index: 1001;
+    box-sizing: border-box;
+  }
+
+  /* Show the dropdown when 'open' class is applied */
+  .simp-navbar-nav.open {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+  }
+
+  .simp-navbar-nav li {
+    width: 100%; /* Ensures list item takes full width of dropdown */
+    text-align: left; /* Aligns list item content to the left */
+    padding-left: 20px; /* Add some left padding for alignment with dropdown's padding */
+  }
+
+  .simp-navbar-nav li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem; /* Reduced font size for mobile links */
+    font-weight: 500;
+    display: block;
+    padding: 8px 0; /* Reduced padding for tap area */
+  }
+
+  .simp-navbar-nav li a:hover {
+    color: #007bff;
+    background-color: #f5f5f5;
+  }
+
+  /* Show mobile-specific signup button in the menu */
+  .simp-navbar-nav .mobile-auth-item {
+    display: block;
+    margin-top: 20px;
+    width: 100%; /* Ensure the li containing the button takes full width */
+    text-align: left; /* Align the button to the left within its li */
+    padding-left: 20px; /* Align with other menu items */
+  }
+
+  .simp-navbar-nav .simp-btn-signup-mobile {
+    padding: 0.6rem 1.2rem; /* Reduced padding for smaller button */
+    border-radius: 45px;
+    background-color: #000; /* Black background */
+    color: #fff; /* White text */
+    border: none;
+    font-size: 0.9rem; /* Reduced font size for button text */
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    width: auto; /* Allow width to be content-based, or set a max-width if needed */
+    max-width: 180px; /* Example max-width for the button */
+    box-sizing: border-box;
+    display: inline-block; /* Treat as inline-block to allow text-align on parent */
+  }
+
+  .simp-navbar-nav .simp-btn-signup-mobile:hover {
+    background-color: #333; /* Darker grey on hover */
   }
 }

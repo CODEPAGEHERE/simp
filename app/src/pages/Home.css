@@ -1,95 +1,60 @@
-/* app/src/pages/LandingPage.css */
+/* app/src/pages/Home.css */
+
+/* =========================================== */
+/* --- DESKTOP FIRST STYLES (DEFAULT) ---  */
+/* =========================================== */
 
 .landing-page-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f8f8f8; /* Light background */
 }
 
 .landing-main-content {
   flex-grow: 1; /* Takes up remaining space */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: center; /* Center content vertically within its space */
   align-items: center;
-  padding: 20px;
+  padding: 20px; /* General padding around the content block */
   text-align: center;
   opacity: 0; /* Hidden by default, will animate in */
   animation: fadeIn 1.5s forwards 1s; /* Fade in after navbar */
+  margin-top: 100px; /* DESKTOP: Pushes content down from the top (e.g., below Navbar) */
 }
 
 .main-logo-icon-container {
-  margin-bottom: 20px;
+  margin-bottom: 10px; /* DESKTOP: Space below logo, before title */
 }
 
 .main-logo-icon {
-  width: 80px; /* Adjust size for mobile */
-  height: 80px;
+  width: 100px; /* DESKTOP: Logo size */
+  height: 100px;
   animation: rotateIn 1s forwards 0.5s; /* Simple rotation animation for logo */
 }
 
 .landing-title {
-  font-size: 3rem; /* Large title for mobile */
-  font-weight: 700;
+  font-size: 5rem; /* DESKTOP: Large title size */
+  font-weight: 400; /* DESKTOP: Reduced boldness for "Simp" text */
   color: #333;
   margin-bottom: 10px;
 }
 
 .landing-subtitle {
-  font-size: 1.2rem;
+  font-size: 1.5rem; /* DESKTOP: Subtitle size */
   color: #555;
   margin-bottom: 5px;
 }
 
 .landing-subtitle-small {
-  font-size: 1rem;
+  font-size: 1.2rem; /* DESKTOP: Small subtitle size */
   color: #777;
-  margin-bottom: 50px; /* Space before buttons */
+  margin-bottom: 80px; /* DESKTOP: More space before buttons */
 }
 
+/* Hide the entire landing-actions container on desktop by default */
 .landing-actions {
-  display: flex;
-  flex-direction: column; /* Stack buttons vertically on mobile */
-  gap: 15px; /* Space between buttons */
-  width: 100%;
-  max-width: 250px; /* Limit button width on mobile */
-  margin-top: 20px;
-}
-
-.simp-btn-start {
-  padding: 0.8rem 2rem;
-  border-radius: 25px; /* More rounded */
-  background-color: #e0e0e0; /* Light grey background */
-  color: #333;
-  border: 1px solid #ccc;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.simp-btn-start:hover {
-  background-color: #d0d0d0;
-}
-
-.or-separator {
-  color: #aaa;
-  font-size: 0.9rem;
-  margin: -5px 0; /* Adjust vertical spacing */
-}
-
-.simp-btn-signup-mobile {
-  background: none; /* No background */
-  border: none; /* No border */
-  color: #007bff; /* Blue text */
-  font-weight: 600;
-  text-decoration: none;
-  font-size: 1rem;
-  transition: color 0.3s ease;
-}
-
-.simp-btn-signup-mobile:hover {
-  color: #0056b3;
+  display: none; /* DESKTOP: Hide the entire button group */
 }
 
 /* --- Animations --- */
@@ -109,49 +74,92 @@
   }
 }
 
-/* --- Media Queries for Desktop (min-width) --- */
-@media (min-width: 992px) {
+/* ========================================= */
+/* --- MOBILE STYLES (MAX-WIDTH MEDIA QUERY) --- */
+/* ========================================= */
+@media (max-width: 991px) {
+
   .landing-main-content {
-    padding-top: 0; /* Adjust padding after navbar */
-    justify-content: center; /* Center content vertically */
+    margin-top: 0; /* MOBILE OVERRIDE: Remove top margin to avoid overflow */
+    padding-top: 0; /* Ensure no conflicting top padding */
+  }
+
+  .main-logo-icon-container {
+    margin-bottom: 5px; /* MOBILE OVERRIDE: Closer logo to text */
   }
 
   .main-logo-icon {
-    width: 100px; /* Larger logo on desktop */
-    height: 100px;
+    width: 80px; /* MOBILE OVERRIDE: Smaller logo */
+    height: 80px;
   }
 
   .landing-title {
-    font-size: 5rem; /* Larger title for desktop */
+    font-size: 3rem; /* MOBILE OVERRIDE: Smaller title */
+    font-weight: 400; /* MOBILE OVERRIDE: Keep boldness consistent */
   }
 
   .landing-subtitle {
-    font-size: 1.5rem;
+    font-size: 1.2rem; /* MOBILE OVERRIDE: Smaller subtitle */
   }
 
   .landing-subtitle-small {
-    font-size: 1.2rem;
-    margin-bottom: 80px; /* More space for desktop */
+    font-size: 1rem; /* MOBILE OVERRIDE: Smaller text */
+    margin-bottom: 50px; /* MOBILE OVERRIDE: Less space before buttons */
   }
 
+  /* Show the landing-actions container on mobile */
   .landing-actions {
-    flex-direction: row; /* Buttons side-by-side on desktop */
-    gap: 30px;
-    max-width: none; /* No max width */
+    display: flex; /* MOBILE OVERRIDE: Show the button group */
+    flex-direction: column; /* Buttons stacked vertically on mobile */
+    gap: 15px; /* Space between buttons */
+    width: 100%; /* Take full width of parent */
+    max-width: 250px; /* Limit button width on mobile */
+    margin-top: 20px; /* Space above buttons on mobile */
   }
 
+  /* --- Button Specific Styles for MOBILE --- */
   .simp-btn-start {
-    padding: 1rem 3rem; /* Larger buttons on desktop */
-    font-size: 1.1rem;
+    padding: 0.8rem 2rem;
+    border-radius: 25px;
+    background-color: #e0e0e0;
+    color: #333;
+    border: 2px solid black; /* <<< --- THIS IS THE KEY CHANGE for Start button border */
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 1rem;
   }
 
-  .simp-btn-signup-mobile {
-    /* Hide the mobile signup button on desktop */
-    display: none;
+  .simp-btn-start:hover {
+    background-color: #d0d0d0;
   }
 
   .or-separator {
-    /* Hide the 'OR' separator on desktop */
-    display: none;
+    display: block;
+    color: #aaa;
+    font-size: 0.9rem;
+    margin: -5px 0;
+  }
+
+  .lnkk {
+    background: none;
+    border: none;
+    color: #007bff !important; /* <<< --- THIS IS THE KEY CHANGE for Signup button color */
+    font-weight: 600; /* Keeps it distinct but still link-like */
+    text-decoration: underline !important; 
+    font-size: 1rem;
+    transition: color 0.3s ease;
+    padding: 0; /* Ensures it behaves like a link without extra padding */
+  }
+  
+  .lnk{
+	  border: 1px solid black !important;
+	  border-radius:90px;
+	  text-align:center:
+  }
+
+  .simp-btn-signup-mobile:hover {
+    color: #0056b3;
+    text-decoration: none; /* Optional: remove underline on hover for modern link feel */
   }
 }

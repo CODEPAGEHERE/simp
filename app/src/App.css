@@ -1,15 +1,70 @@
 /* app/src/App.css */
+
+/* Global styles */
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%; /* Or min-height: 100vh; for more flexibility */
-  min-height: 100vh; /* Using vh is generally better for full viewport height */
-  /* Other body styles */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f8f8f8; /* Use light background matching design */
-  color: #333;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+#root, .App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  position: relative;
+  z-index: 1; /* Ensure content is above background effects */
+
+  /* Desktop Background: Light grey background with two wide, faded blue round stains */
+  background-color: #f8f8f8; /* Light background as the base color */
+
+  background-image:
+    /* Top-left truly circular and bluer fading stain */
+    radial-gradient(circle at center, /* Center of the gradient within its background-size area */
+                    rgba(65, 105, 225, 0.15) 0%, /* RoyalBlue - more distinctly blue, 15% opaque */
+                    transparent 60%), /* Fades out smoothly by 60% of its radius */
+    /* Bottom-right truly circular and bluer fading stain */
+    radial-gradient(circle at center, /* Center of the gradient within its background-size area */
+                    rgba(0, 102, 204, 0.15) 0%, /* Deeper Blue - more distinctly blue, 15% opaque */
+                    transparent 60%); /* Fades out smoothly by 60% of its radius */
+
+  /* Background size and position for the two stains (crucial for controlled circularity and placement) */
+  background-size:
+    min(40vw, 300px) min(40vh, 300px), /* Smaller size to keep them more contained */
+    min(40vw, 300px) min(40vh, 300px);
+
+  background-position:
+    20% 20%, /* Position the top-left stain: 20% from left, 20% from top */
+    80% 80%; /* Position the bottom-right stain: 80% from left, 80% from top */
+
+  background-repeat: no-repeat; /* Crucial: ensures stains don't tile */
+  background-attachment: fixed; /* Keep background fixed while content scrolls */
+}
+
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ========================================= */
+/* --- MOBILE STYLES (MAX-WIDTH MEDIA QUERY) --- */
+/* ========================================= */
+@media (max-width: 991px) {
+
+  #root, .App {
+    background-image: none; /* Remove all background gradients on mobile */
+    background-color: transparent; /* No background color on mobile */
+    background-attachment: scroll; /* Reset if fixed for desktop */
+  }
 }

@@ -1,9 +1,14 @@
+html {
+  box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
 body {
   margin: 0;
-  /* REMOVE OR COMMENT OUT THESE TWO LINES: */
-  /* display: flex; */
-  /* place-items: center; */
+  padding: 0;
   min-width: 320px;
   min-height: 100vh;
-  /* Keep other properties as they are or adjust as needed */
+  /* Ensure no background-color or background-image set here */
 }
