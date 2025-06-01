@@ -4,8 +4,10 @@ const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 
 
+
 // routes
 const authRoutes = require('./routes/auth');
+
 
 
 
@@ -26,8 +28,13 @@ app.use(cors({
 app.use(express.json()); 
 
 
+
+
 // --- API Routes ---
 app.use('/auth', authRoutes); 
+
+
+
 
 
 app.get('/', (req, res) => {
@@ -43,8 +50,10 @@ app.use((err, req, res, next) => {
 module.exports = app;
 
 
+
+
 if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 3001;
+  const PORT = process.env.PORT ;
   app.listen(PORT, () => {
     console.log(`Backend server running on http://localhost:${PORT}`);
 	

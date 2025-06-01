@@ -108,7 +108,7 @@ const Signup = () => {
                                                     required
                                                 />
                                                 <Form.Text className="text-muted">
-                                                    Lowercase, 5-50 characters, alphabets only.
+                                                   
                                                 </Form.Text>
                                             </Form.Group>
                                         </Col>
@@ -125,7 +125,7 @@ const Signup = () => {
                                                     required
                                                 />
                                                 <Form.Text className="text-muted">
-                                                    Nigeria number. Normalized to +234XXXXXXXXXX.
+                                                   
                                                 </Form.Text>
                                             </Form.Group>
                                         </Col>
@@ -146,7 +146,7 @@ const Signup = () => {
                                                     required
                                                 />
                                                 <Form.Text className="text-muted">
-                                                    Lowercase, letters and numbers only.
+                                                  
                                                 </Form.Text>
                                             </Form.Group>
                                         </Col>
@@ -163,7 +163,7 @@ const Signup = () => {
                                                     required
                                                 />
                                                 <Form.Text className="text-muted">
-                                                    Minimum 8 characters, letters and numbers only.
+                                                  
                                                 </Form.Text>
                                             </Form.Group>
                                         </Col>
