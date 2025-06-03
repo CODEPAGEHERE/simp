@@ -1,4 +1,7 @@
-require('dotenv').config();
+// Conditionally load dotenv for local development only
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
 const express = require('express');
 const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
