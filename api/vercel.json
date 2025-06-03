@@ -2,7 +2,7 @@
   "builds": [
     {
       "src": "index.js",
-      "use": "@vercel/node@3.0.0" // Explicitly use Vercel's Node.js 20.x builder
+      "use": "@vercel/node@3.0.0"
     }
   ],
   "routes": [
