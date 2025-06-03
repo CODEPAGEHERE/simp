@@ -2,7 +2,13 @@
   "builds": [
     {
       "src": "index.js",
-      "use": "@vercel/node@3.0.0"
+      "use": "@vercel/node@3.0.0",
+      "config": {
+        "includeFiles": [
+          "node_modules/**",  
+          "prisma/**"         
+        ]
+      }
     }
   ],
   "routes": [
@@ -10,5 +16,6 @@
       "src": "/(.*)",
       "dest": "index.js"
     }
-  ]
+  ],
+  "buildCommand": "npx prisma generate && npm install --production=false"
 }
