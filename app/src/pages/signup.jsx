@@ -4,8 +4,7 @@ import { gsap } from 'gsap';
 import Navbar from '../components/Navbar';
 import '../App.css';
 import './signup.css';
-// Ensure 'bootstrap-icons/font/bootstrap-icons.css' is imported somewhere globally,
-// like in your src/index.js or App.js, if it's not already.
+
 
 const Signup = () => {
     const [name, setName] = useState('');
@@ -84,7 +83,7 @@ const Signup = () => {
                         {/* NEW: Adjusted Col size to make the form wider */}
                         <Col md={9} lg={8}>
                             <div className="p-4 border rounded shadow-sm bg-white">
-                                <h2 className="text-center mb-4">Sign Up With Simp</h2>
+                                <h2 className="text-center mb-4">Create Simp Account</h2>
 
                                 {message && (
                                     <Alert variant={messageType} className="mb-3 text-center">
@@ -169,7 +168,7 @@ const Signup = () => {
                                         </Col>
                                     </Row>
 
-                                    <Button variant="primary" type="submit" className="w-100 mt-3">
+                                    <Button variant="secondary" type="submit" className="w-100 mt-3">
                                         <i className="bi bi-check-circle-fill me-2"></i>Sign Up
                                     </Button>
                                 </Form>

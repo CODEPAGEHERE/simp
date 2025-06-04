@@ -20,14 +20,14 @@ const NotFound = () => {
             />
 
             {/* 404 Message */}
-            <h1 className="display-1 fw-bold text-primary">404</h1>
+            <h1 className="display-1 fw-bold text-secondary">404</h1>
             <h2 className="mb-3 text-secondary">TimeOut - Page Not Found</h2>
             <p className="lead mb-4">
               Oops! The page you're looking for doesn't exist. It might have been moved or deleted.
             </p>
 
             {/* Go to Homepage Button */}
-            <Button as={Link} to="/" variant="outline-primary" size="lg">
+            <Button as={Link} to="/" variant="outline-secondary" size="lg">
               <i className="bi bi-arrow-left me-2"></i>Go to Homepage
             </Button>
           </Col>
