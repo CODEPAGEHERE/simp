@@ -5,7 +5,7 @@ import Signup from './pages/signup';
 import './App.css';
 import NotFound from './pages/NotFound';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard'; // Corrected capitalization based on common practice
+import Dashboard from './pages/dashboard'; // Corrected capitalization based on common practice
 import MakeSchedule from './pages/MakeSchedule'; // Import the MakeSchedule page
 import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRoute
 

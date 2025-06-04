@@ -1,6 +1,7 @@
+// src/pages/MakeSchedule.jsx
 import React, { useState } from 'react';
 import Nav from '../components/Nav';
-import './MakeSchedule.css';
+import './MakeSchedule.css'; // Make sure this CSS file is correctly linked and applied
 
 const MakeSchedule = () => {
   const [mainTask, setMainTask] = useState({
@@ -59,19 +60,30 @@ const MakeSchedule = () => {
   };
 
   const handleSaveSchedule = (e) => {
-    e.preventDefault();
-    console.log('Main Task:', mainTask);
-    console.log('Sub Tasks:', subTasks);
-    alert('Schedule data logged to console. Backend will process hh/mm/ss!');
+    e.preventDefault(); // Prevent default form submission behavior
+    console.log('Main Task (Save for Later):', mainTask);
+    console.log('Sub Tasks (Save for Later):', subTasks);
+    alert('Schedule saved! (Backend logic for saving goes here)');
+    // In a real application, you'd send this data to your backend API
+  };
+
+  const handleStartSchedule = (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
+    console.log('Main Task (Start Now):', mainTask);
+    console.log('Sub Tasks (Start Now):', subTasks);
+    alert('Schedule started! (Backend logic for starting now goes here)');
+    // In a real application, you'd send this data to your backend API
+    // and potentially redirect the user to an 'Ongoing Schedule' page
   };
 
   return (
     <div>
       <Nav />
       <div className="make-schedule-page-content">
-        <div className="form-container">
+        <div className="form-container"> {/* This container is designed to be scrollable */}
           <h2 className="form-heading">Create Schedule</h2>
-          <form onSubmit={handleSaveSchedule}>
+          {/* We've removed onSubmit from the form tag and added onClick to buttons for specific actions */}
+          <form>
             {/* Main Task Name and Total Duration on one line */}
             <div className="input-group-row">
               <div className="input-field-half">
@@ -190,9 +202,13 @@ const MakeSchedule = () => {
 
             <hr className="bold-hr" />
 
-            <div className="save-button-container">
-              <button type="submit" className="save-button">
+            {/* Buttons for Save and Start */}
+            <div className="button-group">
+              <button type="submit" onClick={handleSaveSchedule} className="save-button">
                 Save Schedule
+              </button>
+              <button type="button" onClick={handleStartSchedule} className="start-button">
+                Start Schedule Now
               </button>
             </div>
           </form>
