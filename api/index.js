@@ -10,7 +10,7 @@ const { PrismaClient } = require('@prisma/client');
 
 // routes
 const authRoutes = require('./routes/auth');
-
+const scheduleRoutes = require('./routes/scheduleRoutes');
 
 
 
@@ -35,6 +35,8 @@ app.use(express.json()); 
 
 // --- API Routes ---
 app.use('/auth', authRoutes); 
+app.use('/api', scheduleRoutes(prisma));
+
 
 
 

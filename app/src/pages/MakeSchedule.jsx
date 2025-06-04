@@ -1,6 +1,6 @@
 // src/pages/MakeSchedule.jsx
 import React, { useState } from 'react';
-import Nav from '../components/Nav';
+import Nav from '../components/nav';
 import './MakeSchedule.css'; // Make sure this CSS file is correctly linked and applied
 
 const MakeSchedule = () => {

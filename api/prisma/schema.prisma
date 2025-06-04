@@ -1,42 +1,96 @@
-
 generator client {
   provider = "prisma-client-js"
 }
 
-// Database configuration for both local (SQLite = "sqlite" ) and production (PostgreSQL/Neon = "postgresql" )
-datasource db {
-  provider =  "postgresql" 
-  url      = env("DATABASE_URL")
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 
+
+// Enums to define possible statuses
+enum ScheduleStatus {
+  PENDING       // Schedule is planned but not started
+  IN_PROGRESS   // Schedule is currently being executed
+  COMPLETED     // All sub-tasks are done or the schedule is finished
+  CANCELLED     // Schedule was planned but abandoned
+}
+
+enum SubTaskStatus {
+  PENDING       // Sub-task is planned but not started
+  IN_PROGRESS   // Sub-task is currently being worked on
+  COMPLETED     // Sub-task is finished
+  SKIPPED       // Sub-task was intentionally skipped
+  PAUSED        // Optional: if you want to track pauses
+}
+
+
+
+
+//Person model
 
 model Person {
-  id         Int      @id @default(autoincrement())
-  name       String  
-  phoneNo    String   @unique 
-  username   String   @unique 
-  passwordHash String   
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  name         String
+  phoneNo      String   @unique
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  tasks      Task[]   
+  schedules    Schedule[]
 }
 
 
 
 
-model Task {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  completed   Boolean  @default(false)
 
-  // Relationship fields: This links a Task to a Person
-  personId    Int      
-  person      Person   @relation(fields: [personId], references: [id]) 
+//Schedule model
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Schedule {
+  id                   Int           @id @default(autoincrement())
+  title                String
+  description          String?
+  totalDurationSeconds Int
+
+  // NEW STATUS FIELDS FOR SCHEDULE
+  status               ScheduleStatus @default(PENDING) // Overall status of the schedule
+  actualStartTime      DateTime?      // When the schedule actually started (nullable)
+  actualEndTime        DateTime?      // When the schedule actually finished (nullable)
+
+  personId             Int
+  person               Person        @relation(fields: [personId], references: [id])
+
+  subTasks             SubTask[]
+
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+}
+
+
+
+
+
+
+// SubTask model
+
+model SubTask {
+  id              Int           @id @default(autoincrement())
+  name            String
+  durationSeconds Int
+
+  // NEW STATUS FIELDS FOR SUBTASK
+  status          SubTaskStatus @default(PENDING) // Status of this specific sub-task
+  actualStartTime DateTime?     // When this sub-task actually started (nullable)
+  actualEndTime   DateTime?     // When this sub-task actually finished (nullable)
+  actualDurationSeconds Int?    // Calculated actual duration (nullable)
+  notes           String?       // Optional: For user notes like "finished early/late"
+
+  scheduleId      Int
+  schedule        Schedule      @relation(fields: [scheduleId], references: [id])
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
