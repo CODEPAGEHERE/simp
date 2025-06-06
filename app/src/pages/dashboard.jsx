@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Card, Spinner, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import '../App.css'; // Assuming this has your main app background styles
-import Nav from '../components/Nav'; // Correctly importing Nav for protected routes
+import Nav from '../components/nav'; // Correctly importing Nav for protected routes
 
 const Dashboard = () => {
   const navigate = useNavigate();
