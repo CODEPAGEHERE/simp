@@ -35,7 +35,7 @@ app.use(express.json()); 
 
 // --- API Routes ---
 app.use('/auth', authRoutes); 
-app.use('/api', scheduleRoutes(prisma));
+app.use('/api', scheduleRoutes);
 
 
 
@@ -63,7 +63,7 @@ if (process.env.NODE_ENV !== 'production') {
     console.log(`Backend server running on http://localhost:${PORT}`);
 	
     prisma.$connect()
-      .then(() => console.log("Db connected successfully (local SQLite)."))
+      .then(() => console.log("Db connected successfully (Neon with Prisma)."))
       .catch((e) => console.error("Db connection error:", e));
   });
 }

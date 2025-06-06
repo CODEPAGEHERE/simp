@@ -3,8 +3,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Alert, InputGroup } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
-import '../App.css'; 
-import Navbar from '../components/Navbar'; 
+import '../App.css';
+import Navbar from '../components/Navbar';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -57,7 +57,8 @@ const Login = () => {
                 setMessage(data.message || 'Login successful!');
                 setMessageType('success');
                 if (data.token) {
-                    localStorage.setItem('token', data.token);
+                    // FIX: Store the token with the correct key 'jwtToken'
+                    localStorage.setItem('jwtToken', data.token); // <--- FIX IS HERE!
                 }
                 setTimeout(() => {
                     navigate('/dashboard');
@@ -77,18 +78,12 @@ const Login = () => {
 
     return (
         <>
-            <Navbar /> {/* Render the existing Navbar component here */}
+            <Navbar />
 
-            {/* This outer div handles the overall page background and vertical centering */}
-            {/* Removed 'top-content-padding' from here */}
             <div className="login-page-background">
-
-                {/* The main form container with white background and dark text, inside a Col for width control */}
-                {/* Added mt-5 to the Col for margin from the top */}
                 <Row className="justify-content-center w-100">
-                    <Col xs={12} sm={8} md={5} lg={4} className="mt-5"> {/* Added mt-5 here */}
+                    <Col xs={12} sm={8} md={5} lg={4} className="mt-5">
                         <Container ref={formContainerRef} className="text-center p-4 p-md-5 rounded shadow-sm bg-white form-container">
-                            {/* Moved the heading here, now inside the form container and dark */}
                             <h2 className="text-dark fw-bold mb-4">Login to Simp Account</h2>
 
                             <Form onSubmit={handleSubmit}>
