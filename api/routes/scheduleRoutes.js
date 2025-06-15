@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { Schedule } = require('../controllers/scheduleController');
+const { Schedule } = require('../controllers/schedulecontroller');
 const authMiddleware = require('../middleware/authMiddleware'); // authMiddleware is already a function here
 
 // --- Define Schedule Routes ---
