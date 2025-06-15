@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Nav from '../components/Nav'; // Ensure this path is correct
+import Nav from '../components/nav'; // Ensure this path is correct
 import ScheduleListItem from '../components/ScheduleListItem';
 import './SaveSchedule.css';
 
