@@ -1,9 +1,8 @@
-// src/pages/NotFound.jsx
 import React from 'react';
 import { Container, Row, Col, Button, Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import '../App.css'; // Assuming this has your main app background styles
-import Logo from '../assets/logoh.png'; // <--- ADJUST THIS PATH if your logo is elsewhere!
+import '../App.css';
+import Logo from '../assets/logoh.png';
 
 const NotFound = () => {
   return (
@@ -16,7 +15,7 @@ const NotFound = () => {
               src={Logo}
               alt="Project Logo"
               className="mb-4"
-              style={{ maxWidth: '150px', height: 'auto' }} // Adjust maxWidth as needed
+              style={{ maxWidth: '150px', height: 'auto' }} 
             />
 
             {/* 404 Message */}

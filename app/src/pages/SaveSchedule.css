@@ -1,0 +1,182 @@
+/* --- Global / Body CSS (Crucial for preventing overall page scroll) --- */
+/* You might already have these in a global CSS file or App.css */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevents the entire browser window from scrolling */
+}
+
+/* --- .save-schedule-page-wrapper: Overall page container below the fixed Nav --- */
+.save-schedule-page-wrapper {
+    /* Adjust this padding-top value to perfectly clear your fixed Nav component.
+       Measure your Nav's height in browser dev tools and add a few extra pixels for a gap. */
+    padding-top: 90px; /* Example: If your Nav is 75px tall, 90px gives a 15px gap */
+    padding-bottom: 40px; /* Space at the bottom of the visible page area */
+
+    height: 100vh; /* Ensures this wrapper fills the entire viewport height */
+    box-sizing: border-box; /* Includes padding in the height calculation */
+
+    display: flex;
+    justify-content: center; /* Centers the content (save-schedule-page-content) horizontally */
+    align-items: flex-start; /* Aligns content to the top of the wrapper */
+
+    overflow-y: hidden; /* Ensures this wrapper itself does NOT scroll */
+    overflow-x: hidden; /* Prevents horizontal scroll */
+}
+
+/* --- .save-schedule-page-content: The main content box that holds sections --- */
+.save-schedule-page-content {
+    width: 90%;
+    max-width: 900px; /* Max width for readability on large screens */
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    color: #333333;
+
+    display: flex;
+    flex-direction: column; /* Stacks recent and all schedules sections vertically */
+
+    /* This height calc ensures the content box fits within the wrapper,
+       considering the wrapper's top/bottom padding and this box's top/bottom margins (if any) */
+    /* Example: 100vh - wrapper_padding_top(90) - wrapper_padding_bottom(40) = 100vh - 130px */
+    height: calc(100vh - 130px); /* Adjust '130px' based on actual wrapper padding */
+    overflow: hidden; /* Prevents this entire content box from scrolling itself */
+}
+
+.page-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #000000;
+    font-size: 2.2em;
+    font-weight: bold;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #000000;
+    font-size: 1.6em;
+    font-weight: bold;
+    border-bottom: 1px solid #eeeeee;
+    padding-bottom: 10px;
+}
+
+.section-divider {
+    border: 0;
+    height: 2px;
+    background-color: #e0e0e0;
+    margin: 35px 0;
+}
+
+/* --- Recent Schedules Section --- */
+.recent-schedules-section {
+    margin-bottom: 20px; /* Space below this section */
+}
+
+.recent-schedules-list-container {
+    display: flex; /* Arranges recent schedules horizontally */
+    flex-wrap: wrap; /* Allows items to wrap to the next line */
+    gap: 15px; /* Space between recent schedule items */
+    justify-content: center; /* Centers items if they don't fill the row */
+    padding: 10px 0;
+    /* No direct overflow for this section, assuming a few recent items fit */
+}
+
+/* --- All Schedules Section (The Main Scrollable List) --- */
+.all-schedules-section {
+    flex-grow: 1; /* Allows this section to take up all remaining vertical space */
+    display: flex;
+    flex-direction: column; /* Stacks its content vertically */
+    overflow: hidden; /* Prevents this section from scrolling itself */
+}
+
+.all-schedules-list-container {
+    flex-grow: 1; /* This makes the schedule list itself take available space */
+    overflow-y: auto; /* *** THIS IS THE CRUCIAL PART FOR SCROLLING THE LIST *** */
+    -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
+    padding-right: 15px; /* Adds space for the scrollbar so it doesn't overlap content */
+    padding-bottom: 10px; /* Adds space at the end of the list */
+    box-sizing: border-box; /* Include padding in the dimensions */
+    display: flex;
+    flex-direction: column; /* Ensure items stack vertically within the scroll area */
+    gap: 15px; /* Space between list items */
+}
+
+/* Optional: Scrollbar styling for WebKit browsers (Chrome, Safari, Edge) */
+.all-schedules-list-container::-webkit-scrollbar {
+    width: 8px;
+}
+.all-schedules-list-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.all-schedules-list-container::-webkit-scrollbar-thumb {
+    background: #888888;
+    border-radius: 10px;
+}
+.all-schedules-list-container::-webkit-scrollbar-thumb:hover {
+    background: #555555;
+}
+
+/* --- Message Styles (Loading, Error, No Schedules) --- */
+.save-schedule-loading-state,
+.save-schedule-error-state,
+.no-schedules-message {
+    text-align: center;
+    padding: 20px;
+    font-size: 1.1em;
+    color: #666;
+}
+
+.save-schedule-error-state {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.retry-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+.retry-button:hover {
+    background-color: #0056b3;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .save-schedule-page-wrapper {
+        padding-top: 70px; /* Adjust if your Nav is shorter on mobile */
+        padding-bottom: 20px;
+    }
+    .save-schedule-page-content {
+        width: 95%;
+        padding: 15px;
+        height: calc(100vh - 90px); /* Re-calculate if wrapper padding changes on mobile */
+    }
+    .page-title {
+        font-size: 1.8em;
+    }
+    .section-title {
+        font-size: 1.4em;
+    }
+    .section-divider {
+        margin: 25px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .save-schedule-page-content {
+        padding: 10px;
+    }
+    .recent-schedules-list-container {
+        flex-direction: column; /* Stack recent items vertically */
+        align-items: center; /* Center them when stacked */
+    }
+}

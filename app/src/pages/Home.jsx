@@ -1,12 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar'; // Import the Navbar component
-import '../App.css'; // Main app styles
-import './Home.css'; // Specific styles for LandingPage
+import Navbar from '../components/Navbar'; 
+import '../App.css'; 
+import './Home.css';
 
-// Assuming logoh.png is in src/assets/
-// If you're keeping it in public/, keep src="/logoh.png" and remove this import.
-// import logoh from '../assets/logoh.png';
 
 const Home = () => {
   return (

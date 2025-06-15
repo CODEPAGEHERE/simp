@@ -1,10 +1,10 @@
-// src/pages/Login.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Alert, InputGroup } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import '../App.css';
 import Navbar from '../components/Navbar';
+import './login.css'; 
 
 const Login = () => {
     const navigate = useNavigate();

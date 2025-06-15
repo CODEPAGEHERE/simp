@@ -1,136 +1,149 @@
 .make-schedule-page-content {
-    padding-top: 90px;
-    padding-bottom: 40px;
-    min-height: 80vh; 
+    padding-top: 30px; 
+    padding-bottom: 20px;
+    box-sizing: border-box; /* Include padding in height calculation */
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    justify-content: center; /* Center the form horizontally */
+    align-items: flex-start; /* Align the form to the top of the content area */
+    overflow-y: hidden; /* Ensure this wrapper doesn't scroll itself */
 }
 
+/* --- Form Container: The white box that should remain fixed and NOT scroll itself --- */
 .form-container {
     max-width: 700px;
     width: 80%;
-    margin: 40px auto; 
+    margin: 5px auto; /* Auto margin will center it horizontally */
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    color: #333;
-    max-height: calc(100vh - 210px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS devices */
+    color: #333333;
+    height: calc(100vh - 110px); /* Fixed height for the form container */
+    display: flex;
+    flex-direction: column; /* Stacks children vertically (heading, alert, form) */
+}
+
+/* --- The <form> tag itself: This is now a flex container for its header, scrollable area, and footer --- */
+.main-schedule-form { /* New class for the <form> */
+    flex-grow: 1; /* Allows the form to take remaining vertical space in .form-container */
+    display: flex;
+    flex-direction: column; /* Stacks the form's children vertically */
+    overflow: auto;
+	height:80vh;
+}
+
+/* --- The new scrollable DIV INSIDE the form --- */
+.form-scrollable-area {
+    flex-grow: 1; /* This makes the div take up all available vertical space inside the form */
+    overflow-y: auto; /* THIS IS THE SCROLL! */
+    -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
+    padding-right: 15px; /* Adds space for the scrollbar if needed */
+    box-sizing: border-box; /* Include padding in dimensions */
 }
 
 /* Optional: Scrollbar styling for WebKit browsers (Chrome, Safari, Edge) */
-.form-container::-webkit-scrollbar {
-    width: 8px; /* Width of the scrollbar */
+.form-scrollable-area::-webkit-scrollbar {
+    width: 8px;
 }
-
-.form-container::-webkit-scrollbar-track {
-    background: #f1f1f1; /* Color of the scrollbar track */
+.form-scrollable-area::-webkit-scrollbar-track {
+    background: #f1f1f1;
     border-radius: 10px;
 }
-
-.form-container::-webkit-scrollbar-thumb {
-    background: #888; /* Color of the scrollbar handle */
+.form-scrollable-area::-webkit-scrollbar-thumb {
+    background: #888888;
     border-radius: 10px;
 }
-
-.form-container::-webkit-scrollbar-thumb:hover {
-    background: #555; /* Color of the scrollbar handle on hover */
+.form-scrollable-area::-webkit-scrollbar-thumb:hover {
+    background: #555555;
 }
 
+/* --- General Form Elements (Black & White Theme) --- */
 
 .form-heading {
     text-align: center;
     margin-bottom: 25px;
-    color: #333;
+    color: #000000;
     font-size: 2em;
     font-weight: bold;
 }
 
-/* --- Input Field Positioning --- */
 .input-group-row {
     display: flex;
-    gap: 20px; /* Space between the two main columns */
+    gap: 20px;
     margin-bottom: 20px;
-    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+    flex-wrap: wrap;
+    align-items: flex-start;
 }
 
 .input-field-half {
-    flex: 1; /* Each input field takes equal width */
-    min-width: calc(50% - 10px); /* Ensures they don't get too small before wrapping */
+    flex: 1;
+    min-width: calc(50% - 10px); /* Adjust for gap */
 }
 
-/* --- General Input Styling (Compact & Rounded) --- */
 .form-input {
     width: 100%;
-    padding: 8px 12px; /* Reduced vertical padding, slightly more horizontal */
+    padding: 10px 12px;
     margin-top: 8px;
-    border: 1px solid #ccc;
-    border-radius: 8px; /* More rounded input borders */
-    box-sizing: border-box; /* Ensures padding is included in the element's total width/height */
-    color: #333;
-    background-color: #fff;
-    font-size: 0.95rem; /* Slightly smaller font size */
-    line-height: 1.2; /* Adjust line height for compactness */
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: #333333;
+    background-color: #ffffff;
+    font-size: 0.95rem;
+    line-height: 1.2;
 }
 
 .form-input::placeholder {
-    color: #999;
-    font-size: 0.9em; /* Smaller placeholder text */
+    color: #999999;
+    font-size: 0.9em;
 }
 
 label {
-    display: block; /* Ensures label is on its own line */
+    display: block;
     margin-bottom: 5px;
     font-weight: bold;
-    color: #555;
-    font-size: 0.9em; /* Slightly smaller label font */
+    color: #555555;
+    font-size: 0.9em;
 }
 
-/* --- Time Inputs (HH/MM/SS) Styling --- */
 .time-inputs-group {
     display: flex;
-    align-items: center; /* Vertically align inputs and colon separators */
-    gap: 5px; /* Small gap between elements */
+    align-items: center;
+    gap: 5px;
     margin-top: 8px;
-    flex-wrap: nowrap; /* Prevent HH/MM/SS inputs from wrapping individually */
+    flex-wrap: nowrap;
 }
 
 .time-input {
-    flex: 1; /* Distribute space equally among hh, mm, ss */
-    text-align: center; /* Center the numbers */
-    padding: 8px 5px; /* Adjust padding for smaller inputs */
-    max-width: 60px; /* Further reduced max width for each time input */
-    font-size: 0.9rem; /* Smaller font size for time inputs */
-    -moz-appearance: textfield; /* Remove default spinner on Firefox */
+    flex: 1;
+    text-align: center;
+    padding: 10px 5px;
+    max-width: 60px; /* Limit individual time input width */
+    font-size: 0.9rem;
+    -moz-appearance: textfield; /* Firefox number input arrows */
 }
 
-/* Hide number input arrows (spinners) for Chrome, Safari, Edge */
 .time-input::-webkit-outer-spin-button,
 .time-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
+    -webkit-appearance: none; /* Chrome, Safari, Edge number input arrows */
     margin: 0;
 }
 
 .time-inputs-group span {
-    font-size: 1rem; /* Slightly smaller colon */
+    font-size: 1rem;
     font-weight: bold;
-    color: #555;
+    color: #555555;
 }
 
-/* --- Horizontal Rule (HR) Styling --- */
 .bold-hr {
     border: 0;
-    height: 2px; /* Make it bolder */
-    background-color: #555; /* Darker line for boldness */
+    height: 2px;
+    background-color: #333333;
     margin: 30px 0;
 }
 
-/* --- Sub-Task Section Styling --- */
 .sub-heading {
     margin-bottom: 20px;
-    color: #333;
+    color: #000000;
     font-size: 1.5em;
     font-weight: bold;
     text-align: center;
@@ -139,112 +152,173 @@ label {
 .sub-task-item {
     margin-bottom: 15px;
     padding: 15px;
-    border: 1px dashed #e0e0e0; /* Lighter dashed border */
+    border: 1px dashed #cccccc;
     border-radius: 8px;
- 
+    position: relative;
+    padding-right: 40px; /* Space for remove button */
 }
 
-/* --- Buttons Styling --- */
+/* --- Button Styling (Black & White Theme) --- */
 .plus-button {
-    padding: 10px;
-    border-radius: 50%; /* Circular */
-    border: 1px solid #bbb;
-    background-color: #eee;
-    color: #333;
-    cursor: pointer;
-    font-size: 1.8rem;
-    font-weight: bold;
-    width: 40px; /* Slightly smaller button */
-    height: 40px;
+    background-color: #000000;
+    color: #ffffff;
+    border: 1px solid #000000;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 15px auto;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    margin: 20px auto;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
 }
 
 .plus-button:hover {
-    background-color: #ddd;
-    border-color: #999;
+    background-color: #333333;
+    border-color: #333333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
-.button-group { /* New flex container for multiple buttons */
+.plus-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.remove-subtask-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+    font-weight: bold;
     display: flex;
-    justify-content: center; /* Center the buttons */
-    gap: 20px; /* Space between buttons */
-    margin-top: 30px;
-    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens if needed */
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.remove-subtask-button:hover {
+    background-color: #c82333;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.remove-subtask-button:active {
+    transform: scale(1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin-top: 35px; /* Adjust as needed for spacing after scrollable area */
+    flex-wrap: wrap;
+    padding-top: 15px; /* Add padding to separate from scroll area */
+    border-top: 1px solid #eee; /* Optional: subtle separator */
 }
 
 .save-button,
-.start-button { /* Apply common styles to both buttons */
-    padding: 10px 22px;
-    border-radius: 20px;
-    border: 1px solid #000;
-    color: #fff;
+.start-button {
+    padding: 12px 28px;
+    border-radius: 25px;
+    color: #ffffff;
     cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-    min-width: 150px; /* Give buttons a minimum width for consistency */
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    min-width: 160px;
     text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .save-button {
-    background-color: #000; /* Black background for Save button */
+    background-color: #000000;
+    border: 1px solid #000000;
+    color: #ffffff;
 }
 
 .save-button:hover {
-    background-color: #333;
-    border-color: #333;
+    background-color: #333333;
+    border-color: #333333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
 }
 
-.start-button { /* Distinct style for Start Schedule button */
-    background-color: #6c757d; /* A dark grey, or choose another color for distinction */
-    border-color: #6c757d;
+.save-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.start-button {
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    color: #000000;
 }
 
 .start-button:hover {
-    background-color: #5a6268;
-    border-color: #5a6268;
+    background-color: #f0f0f0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.start-button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.plus-button:disabled,
+.remove-subtask-button:disabled,
+.save-button:disabled,
+.start-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
 /* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
     .input-group-row {
-        flex-direction: column; /* Stack inputs vertically on smaller screens */
+        flex-direction: column;
         gap: 0;
     }
-
     .input-field-half {
         width: 100%;
         margin-right: 0;
         margin-bottom: 15px;
     }
-
     .time-inputs-group {
-        flex-wrap: wrap; /* Allow time inputs to wrap if screen is extremely narrow */
-        justify-content: space-around; /* Distribute space when wrapped */
+        flex-wrap: wrap;
+        justify-content: space-around;
     }
     .time-input {
-        max-width: 80px; /* Maintain a reasonable width */
-        flex: 1 1 auto; /* Allow them to grow and shrink */
+        max-width: 80px;
+        flex: 1 1 auto;
     }
-
     .button-group {
-        flex-direction: column; /* Stack buttons vertically on small screens */
-        gap: 15px; /* Adjust gap when stacked */
+        flex-direction: column;
+        gap: 15px;
     }
-
     .save-button,
     .start-button {
-        width: 100%; /* Full width when stacked */
-        max-width: 300px; /* Prevent them from becoming too wide on larger phones */
-        margin: 0 auto; /* Center individual stacked buttons */
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
     }
-
-    /* Adjust max-height for smaller screens if needed, as on-screen keyboard might reduce viewport */
     .form-container {
-        max-height: calc(100vh - 180px); /* Slightly less space on mobile, adjust buffer */
+        height: calc(100vh - 180px);
     }
 }

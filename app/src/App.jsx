@@ -1,13 +1,14 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'; 
 import Home from './pages/Home';
 import Signup from './pages/signup';
 import './App.css';
 import NotFound from './pages/NotFound';
 import Login from './pages/Login';
-import Dashboard from './pages/dashboard'; // Corrected capitalization based on common practice
-import MakeSchedule from './pages/MakeSchedule'; // Import the MakeSchedule page
-import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRoute
+import Dashboard from './pages/dashboard'; 
+import MakeSchedule from './pages/MakeSchedule'; 
+import ProtectedRoute from './components/ProtectedRoute'; 
+import SaveSchedule from './pages/SaveSchedule'; 
 
 // Placeholder for ForgotPassword
 const ForgotPassword = () => (
@@ -28,7 +29,6 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/* Protected Routes */}
-          {/* Dashboard is protected */}
           <Route
             path="/dashboard"
             element={
@@ -37,12 +37,24 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* MakeSchedule is protected */}
+          
+		  
           <Route
             path="/make-schedule"
             element={
               <ProtectedRoute>
                 <MakeSchedule />
+              </ProtectedRoute>
+            }
+          />
+		  
+		  
+		   {/* Protected Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <SaveSchedule />
               </ProtectedRoute>
             }
           />

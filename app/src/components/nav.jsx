@@ -21,7 +21,7 @@ const Nav = ({ onLogout }) => {
     <nav className="simp-navbar">
       <div className="simp-navbar-inner"> {/* This container is key for desktop margins */}
         <div className="simp-navbar-brand">
-          <Link to="/">
+          <Link to="/dashboard">
             <img src="/logoh.png" alt="Simp Logo" className="logo-icon" />
             <span className="logo-text">Simp</span>
           </Link>

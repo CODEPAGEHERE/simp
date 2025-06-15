@@ -1,0 +1,115 @@
+/* src/components/ScheduleListItem.css */
+
+.schedule-list-item {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 15px 20px;
+    display: flex;
+    flex-direction: column; /* Stacks details and actions vertically */
+    gap: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex-shrink: 0; /* Ensures items don't shrink in the scrollable container */
+    width: 100%; /* Take full width of parent */
+    box-sizing: border-box; /* Include padding/border in width */
+}
+
+.schedule-list-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-details {
+    flex-grow: 1; /* Allows details to take available space */
+}
+
+.schedule-title {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #000000;
+    font-size: 1.3em;
+    word-break: break-word; /* Prevent long titles from overflowing */
+}
+
+.schedule-description {
+    margin-bottom: 5px;
+    color: #555555;
+    font-size: 0.95em;
+    line-height: 1.4;
+    max-height: 4.2em; /* Limit description to 3 lines (1.4em * 3) */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Add ellipsis for overflowed text */
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Limit to 3 lines */
+    -webkit-box-orient: vertical;
+}
+
+.schedule-meta {
+    font-size: 0.85em;
+    color: #777777;
+    margin-bottom: 3px;
+}
+
+.schedule-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end; /* Align buttons to the right */
+    margin-top: 10px; /* Space above buttons */
+}
+
+.action-button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    min-width: 80px; /* Ensure buttons have a minimum width */
+}
+
+.view-button {
+    background-color: #007bff;
+    color: white;
+}
+.view-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+.edit-button {
+    background-color: #ffc107;
+    color: #333; /* Dark text for contrast */
+}
+.edit-button:hover {
+    background-color: #e0a800;
+    transform: translateY(-1px);
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+}
+.delete-button:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+}
+
+/* Responsive adjustments for list item */
+@media (max-width: 480px) {
+    .schedule-list-item {
+        padding: 12px 15px;
+    }
+    .schedule-title {
+        font-size: 1.1em;
+    }
+    .schedule-actions {
+        flex-direction: column; /* Stack buttons on small screens */
+        align-items: flex-end; /* Align stacked buttons to the right */
+    }
+    .action-button {
+        width: 100%; /* Make stacked buttons fill available width */
+        text-align: center;
+    }
+}

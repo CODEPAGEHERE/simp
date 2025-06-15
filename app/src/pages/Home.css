@@ -1,5 +1,3 @@
-/* app/src/pages/Home.css */
-
 /* =========================================== */
 /* --- DESKTOP FIRST STYLES (DEFAULT) ---  */
 /* =========================================== */
@@ -94,17 +92,17 @@
   }
 
   .landing-title {
-    font-size: 3rem; /* MOBILE OVERRIDE: Smaller title */
-    font-weight: 400; /* MOBILE OVERRIDE: Keep boldness consistent */
+    font-size: 3rem; 
+    font-weight: 400; 
   }
 
   .landing-subtitle {
-    font-size: 1.2rem; /* MOBILE OVERRIDE: Smaller subtitle */
+    font-size: 1.2rem; 
   }
 
   .landing-subtitle-small {
-    font-size: 1rem; /* MOBILE OVERRIDE: Smaller text */
-    margin-bottom: 50px; /* MOBILE OVERRIDE: Less space before buttons */
+    font-size: 1rem; 
+    margin-bottom: 50px; 
   }
 
   /* Show the landing-actions container on mobile */
@@ -117,13 +115,13 @@
     margin-top: 20px; /* Space above buttons on mobile */
   }
 
-  /* --- Button Specific Styles for MOBILE --- */
+  
   .simp-btn-start {
     padding: 0.8rem 2rem;
     border-radius: 25px;
     background-color: #e0e0e0;
     color: #333;
-    border: 2px solid black; /* <<< --- THIS IS THE KEY CHANGE for Start button border */
+    border: 2px solid black; 
     font-weight: 600;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -144,12 +142,12 @@
   .lnkk {
     background: none;
     border: none;
-    color: #007bff !important; /* <<< --- THIS IS THE KEY CHANGE for Signup button color */
-    font-weight: 600; /* Keeps it distinct but still link-like */
+    color: #007bff !important; 
+    font-weight: 600; 
     text-decoration: underline !important; 
     font-size: 1rem;
     transition: color 0.3s ease;
-    padding: 0; /* Ensures it behaves like a link without extra padding */
+    padding: 0; 
   }
   
   .lnk{
@@ -160,6 +158,6 @@
 
   .simp-btn-signup-mobile:hover {
     color: #0056b3;
-    text-decoration: none; /* Optional: remove underline on hover for modern link feel */
+    text-decoration: none;
   }
 }
