@@ -8,12 +8,12 @@ const authMiddleware = require('../middleware/authmiddleware'); // authMiddlewar
 // --- Define Schedule Routes ---
 
 // Route to create a new schedule (POST request, requires authentication)
-router.post('/', authmiddleware, Schedule.createSchedule);
+router.post('/', authMiddleware, Schedule.createSchedule);
 
 // NEW: Route to get all schedules for the authenticated user
-router.get('/schedules/user', authmiddleware, Schedule.getSchedulesForUser);
+router.get('/schedules/user', authMiddleware, Schedule.getSchedulesForUser);
 
 // NEW: Route to delete a specific schedule by ID
-router.delete('/schedules/:id', authmiddleware, Schedule.deleteSchedule);
+router.delete('/schedules/:id', authMiddleware, Schedule.deleteSchedule);
 
 module.exports = router;
