@@ -1,3 +1,6 @@
+// This file would likely be something like `backend/controllers/scheduleController.js`
+// (Or whatever you've named the file containing createSchedule)
+
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
@@ -15,33 +18,25 @@ const durationToSeconds = (duration) => {
     return (hh * 3600) + (mm * 60) + ss;
 };
 
+
 /**
  * Controller function to handle the creation of a new schedule.
- * This function acts as an Express middleware (req, res).
- * It expects 'req.userId' to be populated by authentication middleware.
+ * (Your existing code)
  */
 const createSchedule = async (req, res) => {
     try {
-        // Extract the authenticated user's ID from the request object.
-        // This 'userId' is typically added by a JWT authentication middleware.
         const userId = req.userId;
-
-        // Destructure main task and sub-tasks data from the request body.
         const { mainTask, subTasks } = req.body;
 
-        // --- Server-Side Validation ---
-        // Ensure main task data and user ID are present.
         if (!mainTask || !mainTask.name || !mainTask.totalDuration || !userId) {
             return res.status(400).json({ error: 'Missing required main task data or user ID.' });
         }
 
-        // Ensure there's at least one sub-task and it's an array.
         if (!Array.isArray(subTasks) || subTasks.length === 0) {
             return res.status(400).json({ error: 'At least one sub-task is required.' });
         }
 
-        // Validate each sub-task for name and a valid duration.
-        for (const subTask of subTasks) { // Renamed 'st' to 'subTask' for clarity
+        for (const subTask of subTasks) {
             const hasValidDurationComponent = !isNaN(parseInt(subTask.duration.hh)) ||
                                              !isNaN(parseInt(subTask.duration.mm)) ||
                                              !isNaN(parseInt(subTask.duration.ss));
@@ -50,67 +45,161 @@ const createSchedule = async (req, res) => {
                 return res.status(400).json({ error: 'Each sub-task must have a name and a valid duration (HH, MM, or SS).' });
             }
         }
-        // --- End Validation ---
 
-        // Convert main task's total duration to seconds for storage.
         const totalDurationSeconds = durationToSeconds(mainTask.totalDuration);
 
-        // Prepare sub-task data for creation in the database.
         const subTasksToCreate = subTasks.map(subTask => ({
             name: subTask.name,
             durationSeconds: durationToSeconds(subTask.duration),
-            status: 'PENDING' // Default status for new sub-tasks
+            status: 'PENDING'
         }));
 
-        // Use Prisma to create the new schedule record along with its associated sub-tasks.
         const newSchedule = await prisma.schedule.create({
             data: {
                 title: mainTask.name,
-                description: mainTask.description || null, // Allow description to be optional
+                description: mainTask.description || null,
                 totalDurationSeconds: totalDurationSeconds,
-                status: 'PENDING', // Default status for the main schedule
+                status: 'PENDING',
                 person: {
-                    connect: { id: userId } // Link the schedule to the authenticated Person by their ID
+                    connect: { id: userId }
                 },
                 subTasks: {
-                    createMany: { // Use createMany to efficiently create multiple sub-tasks
+                    createMany: {
                         data: subTasksToCreate,
                     },
                 },
             },
-            // Include related data in the response for immediate client use.
             include: {
-                subTasks: true, // Include all newly created sub-tasks
+                subTasks: true,
                 person: {
-                    select: { id: true, username: true, name: true } // Select specific person fields
+                    select: { id: true, username: true, name: true }
                 }
             },
         });
 
-        // Send a success response with the newly created schedule data.
-        res.status(201).json(newSchedule); // 201 Created
+        res.status(201).json(newSchedule);
 
     } catch (error) {
-        // Log the error for server-side debugging.
         console.error('Error creating schedule:', error);
-
-        // --- Error Handling ---
-        // Handle specific Prisma errors for more informative client responses.
-        if (error.code === 'P2002') { // Unique constraint violation (e.g., if schedule title must be unique)
+        if (error.code === 'P2002') {
             res.status(409).json({ error: 'A schedule with this title already exists.' });
-        } else if (error.code === 'P2025') { // Record not found (e.g., if the userId provided doesn't exist)
+        } else if (error.code === 'P2025') {
             res.status(404).json({ error: 'The specified user does not exist or invalid ID.' });
         } else {
-            // Generic server error response for unexpected issues.
             res.status(500).json({ error: 'Failed to create schedule.', details: error.message });
         }
     }
 };
 
-// Export the 'Schedule' object, containing the 'createSchedule' function.
-// This matches how scheduleRoutes.js expects to import it: const { Schedule } = require(...);
+
+/**
+ * Controller function to handle fetching all schedules for the authenticated user.
+ * This function acts as an Express middleware (req, res).
+ * It expects 'req.userId' to be populated by authentication middleware.
+ */
+const getSchedulesForUser = async (req, res) => {
+    try {
+        const userId = req.userId; // Get the user ID from the authentication middleware
+
+        if (!userId) {
+            // This case should ideally be caught by the authentication middleware
+            // but is a good safety check.
+            return res.status(401).json({ error: 'Unauthorized: User ID not found.' });
+        }
+
+        // Use Prisma to find all schedules where the 'personId' matches the authenticated userId.
+        // Include the related 'subTasks' for each schedule.
+        const userSchedules = await prisma.schedule.findMany({
+            where: {
+                personId: userId,
+            },
+            include: {
+                subTasks: true, // Include the associated sub-tasks
+            },
+            // Order by creation date or last used date, if applicable, for a consistent list
+            orderBy: {
+                createdAt: 'desc', // Most recent schedules first
+            },
+        });
+
+        // If no schedules are found, return an empty array (or a specific message)
+        if (!userSchedules || userSchedules.length === 0) {
+            return res.status(200).json([]); // Return an empty array
+            // Alternatively, you could send a message:
+            // return res.status(200).json({ message: 'No schedules found for this user.', schedules: [] });
+        }
+
+        // Return the fetched schedules as a JSON array.
+        res.status(200).json(userSchedules);
+
+    } catch (error) {
+        console.error('Error fetching schedules for user:', error);
+        // Handle specific Prisma errors or general server errors.
+        res.status(500).json({ error: 'Failed to retrieve schedules.', details: error.message });
+    }
+};
+
+
+// Add the delete schedule functionality as well, since your frontend expects it
+const deleteSchedule = async (req, res) => {
+    try {
+        const scheduleId = req.params.id; // Get schedule ID from URL parameters
+        const userId = req.userId; // Get user ID from authentication middleware
+
+        // Validate scheduleId
+        if (!scheduleId) {
+            return res.status(400).json({ error: 'Schedule ID is required.' });
+        }
+
+        // Find the schedule and verify it belongs to the authenticated user
+        const scheduleToDelete = await prisma.schedule.findUnique({
+            where: {
+                id: scheduleId,
+            },
+        });
+
+        if (!scheduleToDelete) {
+            return res.status(404).json({ error: 'Schedule not found.' });
+        }
+
+        if (scheduleToDelete.personId !== userId) {
+            return res.status(403).json({ error: 'Unauthorized to delete this schedule.' });
+        }
+
+        // Delete associated subTasks first (if your Prisma schema uses onDelete: Cascade, this might not be strictly necessary, but it's safer)
+        await prisma.subTask.deleteMany({
+            where: {
+                scheduleId: scheduleId,
+            },
+        });
+
+        // Then delete the schedule itself
+        await prisma.schedule.delete({
+            where: {
+                id: scheduleId,
+            },
+        });
+
+        res.status(200).json({ message: 'Schedule deleted successfully.' });
+
+    } catch (error) {
+        console.error('Error deleting schedule:', error);
+        if (error.code === 'P2025') { // Record to delete does not exist
+            res.status(404).json({ error: 'Schedule not found for deletion.' });
+        } else {
+            res.status(500).json({ error: 'Failed to delete schedule.', details: error.message });
+        }
+    }
+};
+
+
+
+// Export both functions (createSchedule and getSchedulesForUser)
+// This matches how your routes file expects to import them.
 module.exports = {
     Schedule: {
         createSchedule,
+        getSchedulesForUser, // <--- Add this new function to the export
+		 deleteSchedule,  
     },
 };

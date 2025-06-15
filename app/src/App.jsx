@@ -8,7 +8,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/dashboard'; 
 import MakeSchedule from './pages/MakeSchedule'; 
 import ProtectedRoute from './components/ProtectedRoute'; 
-import SaveSchedule from './pages/SaveSchedule'; 
+import SavedSchedule from './pages/SaveSchedule'; 
 
 // Placeholder for ForgotPassword
 const ForgotPassword = () => (
@@ -51,10 +51,10 @@ function App() {
 		  
 		   {/* Protected Routes */}
           <Route
-            path="/dashboard"
+            path="/saved-schedule"
             element={
               <ProtectedRoute>
-                <SaveSchedule />
+                <SavedSchedule />
               </ProtectedRoute>
             }
           />
