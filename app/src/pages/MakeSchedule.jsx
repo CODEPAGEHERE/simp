@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Alert } from 'react-bootstrap';
-import Nav from '../components/Nav';
+import Nav from '../components/nav';
 import '../App.css'; // Assuming this imports global styles
 import './makeschedule.css'; // Your specific styles for this page
 
