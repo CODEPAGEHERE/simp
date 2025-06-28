@@ -1,50 +1,40 @@
 // File: backend/controllers/GetMeController.js
 
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const Prisma = new PrismaClient();
 
 const GetMeController = {
-    /**
-     * Fetches details of the currently authenticated user based on their JWT.
-     * This route is protected by AuthMiddleware.
-     * @param {object} req - Express request object (with req.user.userId from middleware).
-     * @param {object} res - Express response object.
-     */
-    GetMe: async (req, res) => {
+    GetMe: async (Req, Res) => {
         try {
-            // IMPORTANT: Ensure your middleware sets req.user.userId consistently
-            // The middleware you provided attaches userId directly to req.userId.
-            // Let's adjust this to req.user.userId to match your controller's expectation.
-            const userId = req.user.userId; 
+            const UserId = Req.User.UserId;
 
-            if (!userId) {
-                return res.status(401).json({ error: 'Unauthorized: User ID not found in token payload.' });
+            if (!UserId) {
+                return Res.status(401).json({ Error: 'Unauthorized: User ID not found in token payload.' });
             }
 
-            // Fetch the user's details from the database
-            const user = await prisma.person.findUnique({
-                where: { id: userId },
-                select: { // Select specific fields to return (exclude password!)
-                    id: true,
-                    username: true,
-                    email: true,
-                    name: true,
-                    phoneNo: true, // Crucial for the dashboard display
-                    createdAt: true,
+            const User = await Prisma.person.findUnique({
+                where: { Id: UserId },
+                select: {
+                    Id: true,
+                    Username: true,
+                    Email: true,
+                    Name: true,
+                    PhoneNo: true,
+                    CreatedAt: true,
                 },
             });
 
-            if (!user) {
-                return res.status(404).json({ error: 'User not found for the provided token.' });
+            if (!User) {
+                return Res.status(404).json({ Error: 'User not found for the provided token.' });
             }
 
-            res.status(200).json(user); // Send back the user's details
+            Res.status(200).json(User);
 
-        } catch (error) {
-            console.error('Error fetching user data in GetMeController:', error);
-            res.status(500).json({ error: 'Failed to retrieve user data.', details: error.message });
+        } catch (Error) {
+            console.error('Error fetching user data in GetMeController:', Error);
+            Res.status(500).json({ Error: 'Failed to retrieve user data.', Details: Error.Message });
         }
     },
 };
 
-module.exports = GetMeController; // Correct: Export the controller object
+module.exports = GetMeController;
