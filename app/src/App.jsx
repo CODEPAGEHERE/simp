@@ -9,7 +9,7 @@ import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import Home from './pages/Home';
-import SignUp from './pages/SignUp';
+import Signup from './pages/Signup';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import MakeSchedule from './pages/MakeSchedule';
@@ -38,7 +38,7 @@ function App() {
                 <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={<Home />} />
-                    <Route path="/register" element={<SignUp />} />
+                    <Route path="/register" element={<Signup />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
 
