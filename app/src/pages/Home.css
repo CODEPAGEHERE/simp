@@ -5,7 +5,10 @@
 .landing-page-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100vh; /* Ensure it takes full viewport height */
+  justify-content: center; /* Center content vertically if not enough to fill */
+  align-items: center; /* Center content horizontally */
+  
 }
 
 .landing-main-content {
@@ -18,36 +21,36 @@
   text-align: center;
   opacity: 0; /* Hidden by default, will animate in */
   animation: fadeIn 1.5s forwards 1s; /* Fade in after navbar */
-  margin-top: 100px; /* DESKTOP: Pushes content down from the top (e.g., below Navbar) */
+  /* REMOVED: margin-top: 100px; - Layout component handles global top padding now */
 }
 
 .main-logo-icon-container {
-  margin-bottom: 10px; /* DESKTOP: Space below logo, before title */
+  margin-bottom: 10px;
 }
 
 .main-logo-icon {
-  width: 100px; /* DESKTOP: Logo size */
+  width: 100px;
   height: 100px;
-  animation: rotateIn 1s forwards 0.5s; /* Simple rotation animation for logo */
+  animation: rotateIn 1s forwards 0.5s;
 }
 
 .landing-title {
-  font-size: 5rem; /* DESKTOP: Large title size */
-  font-weight: 400; /* DESKTOP: Reduced boldness for "Simp" text */
+  font-size: 5rem;
+  font-weight: 400;
   color: #333;
   margin-bottom: 10px;
 }
 
 .landing-subtitle {
-  font-size: 1.5rem; /* DESKTOP: Subtitle size */
+  font-size: 1.5rem;
   color: #555;
   margin-bottom: 5px;
 }
 
 .landing-subtitle-small {
-  font-size: 1.2rem; /* DESKTOP: Small subtitle size */
+  font-size: 1.2rem;
   color: #777;
-  margin-bottom: 80px; /* DESKTOP: More space before buttons */
+  margin-bottom: 80px;
 }
 
 /* Hide the entire landing-actions container on desktop by default */
@@ -76,52 +79,51 @@
 /* --- MOBILE STYLES (MAX-WIDTH MEDIA QUERY) --- */
 /* ========================================= */
 @media (max-width: 991px) {
-
   .landing-main-content {
-    margin-top: 0; /* MOBILE OVERRIDE: Remove top margin to avoid overflow */
+    margin-top: 0; /* MOBILE OVERRIDE: Remains 0 */
     padding-top: 0; /* Ensure no conflicting top padding */
   }
 
   .main-logo-icon-container {
-    margin-bottom: 5px; /* MOBILE OVERRIDE: Closer logo to text */
+    margin-bottom: 5px;
   }
 
   .main-logo-icon {
-    width: 80px; /* MOBILE OVERRIDE: Smaller logo */
+    width: 80px;
     height: 80px;
   }
 
   .landing-title {
-    font-size: 3rem; 
-    font-weight: 400; 
+    font-size: 3rem;
+    font-weight: 400;
   }
 
   .landing-subtitle {
-    font-size: 1.2rem; 
+    font-size: 1.2rem;
   }
 
   .landing-subtitle-small {
-    font-size: 1rem; 
-    margin-bottom: 50px; 
+    font-size: 1rem;
+    margin-bottom: 50px;
   }
 
   /* Show the landing-actions container on mobile */
   .landing-actions {
-    display: flex; /* MOBILE OVERRIDE: Show the button group */
-    flex-direction: column; /* Buttons stacked vertically on mobile */
-    gap: 15px; /* Space between buttons */
-    width: 100%; /* Take full width of parent */
-    max-width: 250px; /* Limit button width on mobile */
-    margin-top: 20px; /* Space above buttons on mobile */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 250px;
+    margin-top: 20px;
   }
-
   
+  /* Buttons should inherit from Bootstrap first, then customized */
   .simp-btn-start {
     padding: 0.8rem 2rem;
     border-radius: 25px;
     background-color: #e0e0e0;
     color: #333;
-    border: 2px solid black; 
+    border: 2px solid black;  
     font-weight: 600;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -139,21 +141,21 @@
     margin: -5px 0;
   }
 
-  .lnkk {
+  .lnkk { /* This class is for signup, potentially specific to mobile link */
     background: none;
     border: none;
-    color: #007bff !important; 
-    font-weight: 600; 
-    text-decoration: underline !important; 
+    color: #007bff !important;  
+    font-weight: 600;  
+    text-decoration: underline !important;  
     font-size: 1rem;
     transition: color 0.3s ease;
-    padding: 0; 
+    padding: 0;  
   }
   
-  .lnk{
-	  border: 1px solid black !important;
-	  border-radius:90px;
-	  text-align:center:
+  .lnk{ /* This class is for start button */
+    border: 1px solid black !important;
+    border-radius:90px;
+    text-align:center; /* Typo fix: text-align */
   }
 
   .simp-btn-signup-mobile:hover {

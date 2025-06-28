@@ -1,159 +1,152 @@
-// src/pages/Dashboard.jsx
+// This file: frontend/src/pages/Dashboard.jsx
+
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Card, Spinner, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Spinner, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import '../App.css'; // Assuming this has your main app background styles
-import Nav from '../components/nav'; // Correctly importing Nav for protected routes
+import './Dashboard.css'; // Your main app styles
+import { useAuth } from '../context/AuthContext'; // Import useAuth to get user data
 
 const Dashboard = () => {
-  const navigate = useNavigate();
-  const [userName, setUserName] = useState('User');
-  const [lastLogin, setLastLogin] = useState('N/A');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    const navigate = useNavigate();
+    const { userData, isAuthenticated, authToken } = useAuth();
 
-  const API_BASE_URL = import.meta.env.VITE_SIMP_API_POINT;
+    const [allDashboardSchedules, setAllDashboardSchedules] = useState([]); // Combined list
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  // Function to handle logout - Defined within Dashboard to manage its state and navigation
-  const handleLogout = () => {
-    console.log("DEBUG: Logging out from Dashboard page..."); // Added for debugging
-    localStorage.removeItem('jwtToken'); // **Crucial:** Remove the token from local storage
-    navigate('/login'); // **Crucial:** Redirect to the login page
-  };
+    const API_BASE_URL = import.meta.env.VITE_SIMP_API_POINT; // Your API base URL
 
-  // Function to fetch user data and other dashboard info
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      // **CRITICAL CHECK 1: Token Retrieval**
-      const token = localStorage.getItem('jwtToken');
-      console.log("DEBUG: Dashboard useEffect: Checking for token. Token found:", !!token); // Debug log
-      if (!token) {
-        console.warn("DEBUG: Dashboard useEffect: No token found, redirecting to login."); // Debug log
-        navigate('/login'); // Redirect to login if no token is found
-        return; // Stop execution of this useEffect
-      }
+    useEffect(() => {
+        const FetchDashboardSchedules = async () => { // PascalCase function name
+            if (!isAuthenticated || !authToken) {
+                console.warn("DEBUG: Dashboard: Not authenticated or token missing.");
+                setLoading(false);
+                return;
+            }
 
-      try {
-        console.log("DEBUG: Dashboard useEffect: Attempting to fetch /auth/me with token..."); // Debug log
-        const response = await fetch(`${API_BASE_URL}/auth/me`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Ensure 'Bearer ' prefix and correct token
-          },
-        });
+            setLoading(true);
+            setError(null);
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log("DEBUG: Dashboard fetch successful, data:", data); // Debug log
-          setUserName(data.name || data.username || 'User');
-          setLastLogin(data.lastLogin ? new Date(data.lastLogin).toLocaleString() : 'Just now');
-          setError(null);
-        } else {
-          // **CRITICAL CHECK 2: Unauthorized/Forbidden Redirect Logic**
-          const errorData = await response.json();
-          console.error("DEBUG: Dashboard fetch failed:", response.status, errorData); // Debug log
-          setError(errorData.message || 'Failed to load dashboard data.');
-          if (response.status === 401 || response.status === 403) {
-            console.warn("DEBUG: Dashboard fetch: Received 401/403, removing token and redirecting to login."); // Debug log
-            localStorage.removeItem('jwtToken'); // Remove the invalid/expired token
-            navigate('/login'); // Redirect to login
-          }
-        }
-      } catch (err) {
-        console.error('DEBUG: Dashboard fetch: Network or unexpected error:', err); // Debug log
-        setError('Network error or server unavailable.');
-      } finally {
-        setLoading(false);
-      }
-    };
+            try {
+                console.log("DEBUG: Dashboard useEffect: Attempting to fetch /dashboard...");
+                const response = await fetch(`${API_BASE_URL}/dashboard`, { // Correct endpoint
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`,
+                    },
+                });
 
-    fetchDashboardData();
-  }, [navigate, API_BASE_URL]); // Dependencies for useEffect
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("DEBUG: Dashboard schedules fetched:", data);
 
-  // Conditional rendering for loading state
-  if (loading) {
-    return (
-      <>
-        {/* **CRITICAL FIX 3: Pass handleLogout to Nav component** */}
-        <Nav onLogout={handleLogout} />
-        <div className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh', backgroundColor: '#333333' }}>
-          <Spinner animation="border" role="status" variant="light">
-            <span className="visually-hidden">Loading dashboard...</span>
-          </Spinner>
-        </div>
-      </>
+                    const combinedSchedules = [
+                        ...(data.past3Days || []).map(s => ({ ...s, type: 'past' })), // Add a 'type' for differentiation
+                        ...(data.next7Days || []).map(s => ({ ...s, type: 'next' }))
+                    ];
+
+                    // Sort combined schedules: future schedules first by startDate, then past by createdAt
+                    combinedSchedules.sort((a, b) => {
+                        const dateA = a.startDate || a.createdAt;
+                        const dateB = b.startDate || b.createdAt;
+                        return new Date(dateA) - new Date(dateB);
+                    });
+
+                    setAllDashboardSchedules(combinedSchedules);
+                    setError(null);
+                } else {
+                    const errorData = await response.json();
+                    console.error("DEBUG: Dashboard schedules fetch failed:", response.status, errorData);
+                    setError(errorData.error || errorData.message || 'Failed to load dashboard schedules.');
+                }
+            } catch (err) {
+                console.error('DEBUG: Dashboard fetch: Network or unexpected error:', err);
+                setError('Network error or server unavailable when fetching dashboard data.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        FetchDashboardSchedules();
+    }, [isAuthenticated, authToken, API_BASE_URL]);
+
+    const DisplayUserName = userData?.name || userData?.username || 'User';
+    const DisplayUserPhone = userData?.phoneNo ? ` (${userData.phoneNo})` : '';
+
+    // No longer a separate renderScheduleList, directly render in the main return
+    // Function to render individual card content (keeping it concise)
+    const RenderCardContent = (schedule) => (
+        <Card className="h-100 shadow-sm dashboard-card"> {/* Styles applied here */}
+            <Card.Body>
+                <Card.Title className="text-dark">{schedule.title || 'Untitled Schedule'}</Card.Title>
+                <Card.Text className="text-muted">
+                    {schedule.description && (
+                        <>
+                            {schedule.description.substring(0, 70)}...<br />
+                        </>
+                    )}
+                    {schedule.type === 'past' && schedule.createdAt && (
+                        <span>Created: {new Date(schedule.createdAt).toLocaleDateString()}</span>
+                    )}
+                    {schedule.type === 'next' && schedule.startDate && (
+                        <span>Starts: {new Date(schedule.startDate).toLocaleDateString()}</span>
+                    )}
+                </Card.Text>
+                <Link to={`/schedule/${schedule.id}`} className="btn btn-primary btn-sm">View Details</Link>
+            </Card.Body>
+        </Card>
     );
-  }
 
-  // Main Dashboard content for loaded state
-  return (
-    <>
-      {/* **CRITICAL FIX 3: Pass handleLogout to Nav component** */}
-      <Nav onLogout={handleLogout} /> {/* Render the Nav component */}
-      <div className="dashboard-page-background"> {/* Apply background styles */}
-        <Container className="py-4 dashboard-container"> {/* Container for content */}
-          <Row className="justify-content-center">
-            <Col xs={12} md={10} lg={8}> {/* Adjust column width for central content */}
-              <h1 className="text-light text-center mb-4">Hello, {userName}!</h1>
-              {error && <Alert variant="danger" className="mb-4 text-center">{error}</Alert>}
 
-              <Card className="mb-4 shadow-sm dashboard-card">
-                <Card.Body>
-                  <Card.Title className="text-dark">Last Login</Card.Title>
-                  <Card.Text className="text-muted">
-                    Your last login was: **{lastLogin}**
-                  </Card.Text>
-                </Card.Body>
-              </Card>
+    if (loading) {
+        return (
+            <div className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh', backgroundColor: '#333333' }}>
+                <Spinner animation="border" role="status" variant="light">
+                    <span className="visually-hidden">Loading dashboard...</span>
+                </Spinner>
+            </div>
+        );
+    }
 
-              <Row className="mb-4">
-                <Col md={6} className="mb-4">
-                  <Card className="h-100 shadow-sm dashboard-card">
-                    <Card.Body>
-                      <Card.Title className="text-dark">Ongoing Tasks</Card.Title>
-                      <Card.Text className="text-muted">
-                        <ul className="list-unstyled">
-                          <li><i className="bi bi-circle-fill text-warning me-2"></i> Prepare Q3 financial report (Due: 25/06)</li>
-                          <li><i className="bi bi-circle-fill text-warning me-2"></i> Call John about project alpha</li>
-                          <li><i className="bi bi-circle-fill text-warning me-2"></i> Review client feedback for redesign</li>
-                        </ul>
-                        <Link to="/tasks/ongoing" className="card-link">View All Ongoing Tasks</Link>
-                      </Card.Text>
-                    </Card.Body>
-                  </Card>
-                </Col>
+    return (
+        <div className="dashboard-page-background">
+            <Container className="py-4 dashboard-container">
+                <Row className="justify-content-center">
+                    <Col xs={12} md={10} lg={10}> {/* Wider column for the horizontal scroll */}
+                        {/* Custom Greeting Message with Username and Phone Number */}
+                        <h1 className="text-light text-center mb-4">Welcome, {DisplayUserName}{DisplayUserPhone}!</h1>
+                        {error && <Alert variant="danger" className="mb-4 text-center">{error}</Alert>}
 
-                <Col md={6} className="mb-4">
-                  <Card className="h-100 shadow-sm dashboard-card">
-                    <Card.Body>
-                      <Card.Title className="text-dark">Finished Tasks</Card.Title>
-                      <Card.Text className="text-muted">
-                        <ul className="list-unstyled">
-                          <li><i className="bi bi-check-circle-fill text-success me-2"></i> Complete onboarding module (20/05)</li>
-                          <li><i className="bi bi-check-circle-fill text-success me-2"></i> Schedule team meeting for June</li>
-                          <li><i className="bi bi-check-circle-fill text-success me-2"></i> Send out monthly newsletter</li>
-                        </ul>
-                        <Link to="/tasks/finished" className="card-link">View All Finished Tasks</Link>
-                      </Card.Text>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </Row>
+                        {/* Unified Section for Recent Schedules - One Horizontal Line */}
+                        <h2 className="text-light text-center mb-4">Your Recent Schedules</h2>
+                        <div className="recent-schedules-scroll-container"> {/* Custom container for scroll */}
+                            <Row className="flex-nowrap overflow-x-auto pb-3"> {/* Bootstrap classes for horizontal scroll */}
+                                {allDashboardSchedules.length > 0 ? (
+                                    allDashboardSchedules.map(schedule => (
+                                        <Col xs={12} sm={6} md={4} lg={3} className="mb-4 d-flex" key={schedule.id}>
+                                            {/* xs=12, sm=6, md=4, lg=3 ensures responsive sizing without breaking the row */}
+                                            {RenderCardContent(schedule)}
+                                        </Col>
+                                    ))
+                                ) : (
+                                    <Col xs={12}>
+                                        <Alert variant="info" className="text-center">No recent schedules found.</Alert>
+                                    </Col>
+                                )}
+                            </Row>
+                        </div>
 
-              {/* This dedicated logout button here is now redundant because the Nav component handles it */}
-              {/* <div className="text-center mt-4">
-                <Button variant="outline-danger" onClick={handleLogout} size="lg">
-                  Logout
-                </Button>
-              </div> */}
-
-            </Col>
-          </Row>
-        </Container>
-      </div>
-    </>
-  );
+                        {/* Buttons for navigation */}
+                        <div className="text-center mt-4">
+                            <Link to="/make-schedule" className="btn btn-success me-2">Create New Schedule</Link>
+                            <Link to="/saved-schedule" className="btn btn-outline-info">View All Saved Schedules</Link>
+                        </div>
+                    </Col>
+                </Row>
+            </Container>
+        </div>
+    );
 };
 
 export default Dashboard;

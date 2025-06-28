@@ -1,0 +1,30 @@
+.simp-footer {
+    color: black; 
+    padding: 20px 0; /* Vertical padding */
+    text-align: center; /* Center content initially, but then align text inside */
+    border-top: 1px solid #e9ecef; /* Subtle top border */
+    width: 100%;
+    flex-shrink: 0; /* Prevents footer from shrinking if content is small */
+}
+
+.simp-footer-content {
+    max-width: 1200px; /* Match max-width of other main content areas (e.g., Navbar) */
+    margin: 0 auto; /* Center the content within the footer */
+    padding: 0 20px; /* Horizontal padding */
+    display: flex; /* Use flexbox for alignment */
+    justify-content: flex-start; /* Aligns content to the left */
+    align-items: center; /* Vertically center content */
+    font-size: 0.9em; /* Slightly smaller font size */
+}
+
+.simp-footer-content p {
+    margin: 0; /* Remove default paragraph margin */
+}
+
+/* Responsive adjustments if needed */
+@media (max-width: 768px) {
+    .simp-footer-content {
+        justify-content: center; /* Center text on smaller screens for better readability */
+        padding: 0 15px;
+    }
+}

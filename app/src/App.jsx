@@ -1,16 +1,21 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'; 
-import Home from './pages/Home';
-import Signup from './pages/signup';
+import { Routes, Route } from 'react-router-dom';
 import './App.css';
-import NotFound from './pages/NotFound';
-import Login from './pages/Login';
-import Dashboard from './pages/dashboard'; 
-import MakeSchedule from './pages/MakeSchedule'; 
-import ProtectedRoute from './components/ProtectedRoute'; 
-import SavedSchedule from './pages/SaveSchedule'; 
 
-// Placeholder for ForgotPassword
+// Import the AuthProvider to wrap the entire application
+import { AuthProvider } from './context/AuthContext';
+
+import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
+
+import Home from './pages/Home';
+import SignUp from './pages/SignUp';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import MakeSchedule from './pages/MakeSchedule';
+import SavedSchedule from './pages/SavedSchedule';
+import NotFound from './pages/NotFound';
+
 const ForgotPassword = () => (
     <div className="d-flex align-items-center justify-content-center vh-100">
         <h1>Forgot Password Page Under Construction!</h1>
@@ -18,55 +23,42 @@ const ForgotPassword = () => (
 );
 
 function App() {
- 
-  return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/register" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+    // Removed:
+    // const navigate = useNavigate();
+    // const [isAuthenticated, setIsAuthenticated] = useState(false);
+    // useEffect to check token on mount
+    // HandleLogout function
 
-          {/* Protected Routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          
-		  
-          <Route
-            path="/make-schedule"
-            element={
-              <ProtectedRoute>
-                <MakeSchedule />
-              </ProtectedRoute>
-            }
-          />
-		  
-		  
-		   {/* Protected Routes */}
-          <Route
-            path="/saved-schedule"
-            element={
-              <ProtectedRoute>
-                <SavedSchedule />
-              </ProtectedRoute>
-            }
-          />
+    return (
+        // Wrap your entire application with AuthProvider.
+        // This makes the AuthContext available to all nested components.
+        <AuthProvider>
+            {/* Layout no longer needs isAuthenticated or onLogout props passed from App */}
+            <Layout>
+                <Routes>
+                    {/* Public Routes */}
+                    <Route path="/" element={<Home />} />
+                    <Route path="/register" element={<SignUp />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
 
-          {/* Add more protected routes here as needed */}
+                    {/* Protected Routes */}
+                    <Route element={<ProtectedRoute />}>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/make-schedule" element={<MakeSchedule />} />
+                        <Route path="/saved-schedule" element={<SavedSchedule />} />
 
-          {/* This is the 404 catch-all route - MUST BE LAST! */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
-    </Router>
-  );
+                        {/* Add more protected routes here */}
+                        <Route path="/schedule/:id" element={<div>Schedule Detail (Protected)</div>} />
+                        <Route path="/schedule/edit/:id" element={<div>Schedule Edit (Protected)</div>} />
+                    </Route>
+
+                    {/* 404 Catch-all Route - MUST BE THE LAST ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
+            </Layout>
+        </AuthProvider>
+    );
 }
 
 export default App;

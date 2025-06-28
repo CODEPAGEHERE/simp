@@ -1,0 +1,80 @@
+.dashboard-page-background {
+    background-color: #333333; /* Ensure this is also your desired background */
+    min-height: calc(100vh - 56px); /* Adjust for navbar height if present */
+    padding-bottom: 2rem; /* Add some padding at the bottom */
+}
+
+.dashboard-container {
+    background-color: transparent; /* Make container background transparent so page background shows */
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* Style for the schedule cards: white background, black border, shadow */
+.dashboard-card {
+    background-color: white !important; /* Force white background */
+    border: 1px solid black !important; /* Black border */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Existing shadow, or adjust as desired */
+    color: #343a40; /* Dark text inside card for contrast on white background */
+}
+
+/* Ensure text inside card body is dark */
+.dashboard-card .card-title,
+.dashboard-card .card-text {
+    color: #343a40 !important; /* Dark text color for card content */
+}
+
+/* Specific styling for the horizontal scroll container if needed */
+.recent-schedules-scroll-container {
+    padding-bottom: 1rem; /* Provide space for scrollbar */
+}
+
+/* You might need to adjust column flex-shrink behavior if cards are too squished */
+/* Or you can define a min-width for the cards directly */
+.recent-schedules-scroll-container .col {
+    flex-shrink: 0; /* Prevents columns from shrinking too much */
+    width: 250px; /* Example fixed width for cards in horizontal scroll */
+    max-width: 300px; /* Example max width */
+    min-width: 250px; /* Ensure cards don't get too small */
+}
+
+/* Adjustments for the spinner background if it's showing too dark */
+.d-flex.align-items-center.justify-content-center {
+    background-color: #333333; /* Ensure this matches your page background */
+}
+
+/* For the navigation buttons at the bottom */
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+.btn-outline-info {
+    color: #17a2b8;
+    border-color: #17a2b8;
+}
+.btn-outline-info:hover {
+    color: #fff;
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+/* General text color for headings outside of cards */
+h1, h2, h3, h4, h5, h6 {
+    color: #f8f9fa; /* Light color for headings on dark background */
+}
+
+.alert {
+    color: #004085; /* Default Bootstrap info text color */
+    background-color: #cce5ff; /* Default Bootstrap info background color */
+    border-color: #b8daff; /* Default Bootstrap info border color */
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}

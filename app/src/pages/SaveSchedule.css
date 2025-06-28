@@ -8,10 +8,8 @@
 
 /* --- .save-schedule-page-wrapper: Overall page container below the fixed Nav --- */
 .save-schedule-page-wrapper {
-    /* CRITICAL: This padding-top must match the EXACT height of your Nav component.
-       If your Nav is 70px tall, set this to 70px. If it's 80px, set it to 80px, etc.
-       You can use browser dev tools to inspect your Nav's height. */
-    padding-top: 40px; /* Adjust this value based on your Nav's height */
+    /* Since Nav is removed, padding-top might need re-evaluation or removal if not needed for other fixed elements */
+    padding-top: 40px; /* Adjust this value if you have any other fixed header/spacing */
     padding-bottom: 40px; /* Space at the bottom of the visible page area */
 
     box-sizing: border-box; /* Includes padding in the element's total height */
@@ -21,7 +19,7 @@
     align-items: flex-start; /* Aligns content to the top of the wrapper */
 
     /* IMPORTANT: Removed height: 100vh and overflow rules from here.
-       The wrapper should expand naturally with its content, and the main body will scroll. */
+        The wrapper should expand naturally with its content, and the main body will scroll. */
 }
 
 /* --- .save-schedule-page-content: The main content box (the white card) --- */
@@ -36,12 +34,12 @@
     display: flex;
     flex-direction: column; /* Stacks recent and all schedules sections vertically */
 
-    /* This height calculation attempts to make the content box fill available height.
-       It's (100vh - Nav_Height - Wrapper_Bottom_Padding).
-       CRITICAL: Adjust `70px` and `40px` if your Nav height or wrapper bottom padding change. */
-    min-height: calc(100vh - 70px - 40px);
-    max-height: calc(100vh - 70px - 40px);
-    overflow: hidden; /* This makes the entire content box not scroll, but its children can */
+    /* REMOVED: min-height, max-height, and overflow: hidden
+       This allows the content box to expand naturally with its content,
+       and the page's main scrollbar will handle overflow. */
+    /* min-height: calc(100vh - 70px - 40px); */
+    /* max-height: calc(100vh - 70px - 40px); */
+    /* overflow: hidden; */
 }
 
 /* --- Page Title --- */
@@ -111,27 +109,29 @@
     background: #aaaaaa;
 }
 
-/* --- All Schedules Section (Main Vertical Scroll) --- */
+/* --- All Schedules Section (Main Vertical List - now without its own scroll) --- */
 .all-schedules-section {
     flex-grow: 1; /* Allows this section to take up all remaining vertical space */
     display: flex;
     flex-direction: column; /* Stacks its content vertically */
-    overflow: hidden; /* Prevents this section from scrolling itself, passes to child */
+    /* REMOVED: overflow: hidden; here as well, if it's the parent of a non-scrolling child */
 }
 
 .all-schedules-list-container {
-    flex-grow: 1; /* This makes the schedule list itself take available space */
-    overflow-y: auto; /* *** THIS IS THE CRUCIAL PART FOR SCROLLING THE LIST *** */
+    /* flex-grow: 1; - Keep if you want it to expand within the column, but removing scroll makes this less critical */
+    /* REMOVED: overflow-y: auto; */
+    overflow-y: visible; /* Ensure content is always visible and expands its parent */
     -webkit-overflow-scrolling: touch;
-    padding-right: 15px; /* Adds space for the scrollbar so it doesn't overlap content */
+    padding-right: 0; /* REMOVED: padding for scrollbar */
     padding-bottom: 10px; /* Adds space at the end of the list */
     box-sizing: border-box; /* Include padding in the dimensions */
     display: flex;
-    flex-direction: column; /* Ensure items stack vertically within the scroll area */
+    flex-direction: column; /* Ensure items stack vertically within the container */
     gap: 18px; /* Space between list items */
 }
 
-/* Custom scrollbar for WebKit browsers (Chrome, Safari, Edge) for vertical list */
+/* REMOVED: Custom scrollbar styles for .all-schedules-list-container as it no longer scrolls itself */
+/*
 .all-schedules-list-container::-webkit-scrollbar {
     width: 8px;
 }
@@ -146,6 +146,7 @@
 .all-schedules-list-container::-webkit-scrollbar-thumb:hover {
     background: #555555;
 }
+*/
 
 /* --- Message Styles (Loading, Error, No Schedules) --- */
 .save-schedule-loading-state,
@@ -179,14 +180,13 @@
 /* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
     .save-schedule-page-wrapper {
-        padding-top: 70px; /* CRITICAL: Adjust based on your mobile Nav height */
+        padding-top: 20px; /* Adjusted as Nav is removed */
         padding-bottom: 20px;
     }
     .save-schedule-page-content {
         width: 95%;
         padding: 20px;
-        min-height: calc(100vh - 70px - 20px); /* CRITICAL: Adjust based on mobile Nav height and padding */
-        max-height: calc(100vh - 70px - 20px);
+        /* min-height and max-height removed here as well */
     }
     .page-title {
         font-size: 1.8em;

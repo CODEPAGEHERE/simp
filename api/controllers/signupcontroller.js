@@ -48,13 +48,19 @@ const signup = async (req, res) => {
         return res.status(400).json({ message: 'Username can only contain lowercase letters and numbers, no special characters or spaces.' });
     }
 
-    // Password Validation
-    if (cleanPassword.length < 8) {
-        return res.status(400).json({ message: 'Password must be at least 8 characters long.' });
+    // --- UPDATED Password Validation: Increased length, allowed special characters ---
+    // Allow letters, numbers, and common special characters. No spaces.
+    const allowedPasswordCharsRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]+$/;
+
+    if (cleanPassword.length < 9) { // Increased minimum length to 9 characters
+        return res.status(400).json({ message: 'Password must be at least 10 characters long.' });
     }
-    if (!/^[a-zA-Z0-9]+$/.test(cleanPassword)) {
-        return res.status(400).json({ message: 'Password can only contain letters and numbers, no special characters or spaces allowed.' });
+    if (!allowedPasswordCharsRegex.test(cleanPassword)) {
+        return res.status(400).json({
+            message: 'Password can only contain letters, numbers, and common special characters (e.g., !@#$%^&*). No spaces allowed.'
+        });
     }
+    // --- END UPDATED Password Validation ---
 
     // Prevent username and password from being identical
     if (cleanUsername === cleanPassword) {

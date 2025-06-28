@@ -1,6 +1,3 @@
-/* app/src/App.css */
-
-/* Global styles */
 html, body {
   margin: 0;
   padding: 0;
@@ -16,20 +13,20 @@ html, body {
   flex-direction: column;
   flex-grow: 1;
   position: relative;
-  z-index: 1; /* Ensure content is above background effects */
+  z-index: 1; 
 
-  /* Desktop Background: Light grey background with two wide, faded blue round stains */
-  background-color: #f8f8f8; /* Light background as the base color */
+ 
+  background-color: #f8f8f8;
 
   background-image:
-    /* Top-left truly circular and bluer fading stain */
-    radial-gradient(circle at center, /* Center of the gradient within its background-size area */
-                    rgba(65, 105, 225, 0.15) 0%, /* RoyalBlue - more distinctly blue, 15% opaque */
-                    transparent 60%), /* Fades out smoothly by 60% of its radius */
-    /* Bottom-right truly circular and bluer fading stain */
-    radial-gradient(circle at center, /* Center of the gradient within its background-size area */
-                    rgba(0, 102, 204, 0.15) 0%, /* Deeper Blue - more distinctly blue, 15% opaque */
-                    transparent 60%); /* Fades out smoothly by 60% of its radius */
+    
+    radial-gradient(circle at center, 
+                    rgba(65, 105, 225, 0.15) 0%, 
+                    transparent 60%), 
+    
+    radial-gradient(circle at center, 
+                    rgba(0, 102, 204, 0.15) 0%, 
+                    transparent 60%);
 
   /* Background size and position for the two stains (crucial for controlled circularity and placement) */
   background-size:

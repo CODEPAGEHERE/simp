@@ -1,14 +1,18 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // Import your useAuth hook
 
-const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('jwtToken'); 
+const ProtectedRoute = () => {
+  // Use the useAuth hook to get the isAuthenticated state from your context
+  const { isAuthenticated } = useAuth();
 
-  if (!token) {
+  // If not authenticated (based on the reactive context state), redirect
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  return children;
+  // If authenticated, render the nested route components
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

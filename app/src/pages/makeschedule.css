@@ -1,40 +1,46 @@
+/* File: frontend/src/pages/makeschedule.css */
+
+/* --- Page Wrapper: Ensures content is centered and takes full height, handles background --- */
+/* desktop styles */
 .make-schedule-page-content {
-    padding-top: 30px; 
+    padding-top: 30px;
     padding-bottom: 20px;
-    box-sizing: border-box; /* Include padding in height calculation */
+    box-sizing: border-box;
     display: flex;
     justify-content: center; /* Center the form horizontally */
     align-items: flex-start; /* Align the form to the top of the content area */
-    overflow-y: hidden; /* Ensure this wrapper doesn't scroll itself */
+    overflow-y: hidden; /* Prevents main page wrapper from having its own scrollbar on desktop if form is fixed height */
+    min-height: calc(100vh - 56px); /* Adjust if you have a fixed top nav */
 }
 
-/* --- Form Container: The white box that should remain fixed and NOT scroll itself --- */
+/* --- Form Container: The white box that should remain fixed and NOT scroll itself on desktop --- */
 .form-container {
     max-width: 700px;
     width: 80%;
-    margin: 5px auto; /* Auto margin will center it horizontally */
+    margin: 5px auto;
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+   
     color: #333333;
-    height: calc(100vh - 110px); /* Fixed height for the form container */
+    height: calc(100vh - 110px); /* Fixed height for the form container on desktop */
     display: flex;
     flex-direction: column; /* Stacks children vertically (heading, alert, form) */
+    position: relative; /* For absolute positioning of sub-task remove button */
 }
 
-/* --- The <form> tag itself: This is now a flex container for its header, scrollable area, and footer --- */
-.main-schedule-form { /* New class for the <form> */
+/* --- The <form> tag itself: This is a flex container for its header, scrollable area, and footer on desktop --- */
+.main-schedule-form {
     flex-grow: 1; /* Allows the form to take remaining vertical space in .form-container */
     display: flex;
     flex-direction: column; /* Stacks the form's children vertically */
-    overflow: auto;
-	height:80vh;
+    overflow: hidden; /* Prevents the <form> itself from scrolling on desktop */
 }
 
-/* --- The new scrollable DIV INSIDE the form --- */
+/* --- The new scrollable DIV INSIDE the form (Desktop Scroll) --- */
 .form-scrollable-area {
     flex-grow: 1; /* This makes the div take up all available vertical space inside the form */
-    overflow-y: auto; /* THIS IS THE SCROLL! */
+    overflow-y: auto; /* THIS IS THE SCROLL FOR DESKTOP! */
     -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
     padding-right: 15px; /* Adds space for the scrollbar if needed */
     box-sizing: border-box; /* Include padding in dimensions */
@@ -57,7 +63,6 @@
 }
 
 /* --- General Form Elements (Black & White Theme) --- */
-
 .form-heading {
     text-align: center;
     margin-bottom: 25px;
@@ -70,7 +75,7 @@
     display: flex;
     gap: 20px;
     margin-bottom: 20px;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Allows items to wrap to next line on smaller screens */
     align-items: flex-start;
 }
 
@@ -117,14 +122,14 @@ label {
     flex: 1;
     text-align: center;
     padding: 10px 5px;
-    max-width: 60px; /* Limit individual time input width */
+    max-width: 60px;
     font-size: 0.9rem;
-    -moz-appearance: textfield; /* Firefox number input arrows */
+    -moz-appearance: textfield;
 }
 
 .time-input::-webkit-outer-spin-button,
 .time-input::-webkit-inner-spin-button {
-    -webkit-appearance: none; /* Chrome, Safari, Edge number input arrows */
+    -webkit-appearance: none;
     margin: 0;
 }
 
@@ -155,7 +160,7 @@ label {
     border: 1px dashed #cccccc;
     border-radius: 8px;
     position: relative;
-    padding-right: 40px; /* Space for remove button */
+    padding-right: 40px;
 }
 
 /* --- Button Styling (Black & White Theme) --- */
@@ -223,10 +228,10 @@ label {
     display: flex;
     justify-content: center;
     gap: 25px;
-    margin-top: 35px; /* Adjust as needed for spacing after scrollable area */
+    margin-top: 35px;
     flex-wrap: wrap;
-    padding-top: 15px; /* Add padding to separate from scroll area */
-    border-top: 1px solid #eee; /* Optional: subtle separator */
+    padding-top: 15px;
+    border-top: 1px solid #eee;
 }
 
 .save-button,
@@ -289,8 +294,38 @@ label {
     transform: none;
 }
 
-/* --- Responsive Adjustments --- */
+/* --- Responsive Adjustments for Mobile (max-width: 768px) --- */
 @media (max-width: 768px) {
+    /* Allow the entire page to scroll on mobile */
+    .make-schedule-page-content {
+        padding-top: 20px;
+        overflow-y: visible; /* Crucial: Allow content to dictate overall height, remove hidden overflow */
+        align-items: flex-start; /* Align content to start, not stretch */
+    }
+
+    .form-container {
+        width: 95%; /* Make the container wider on mobile */
+        height: auto; /* Crucial: Remove fixed height, allow content to push height */
+        max-height: none; /* Ensure no max-height from other rules */
+        margin-top: 20px;
+        margin-bottom: 20px;
+        box-shadow: none; /* Optional: Remove shadow on mobile for lighter feel */
+        padding: 20px; /* Adjust padding for mobile */
+    }
+
+    .main-schedule-form {
+        height: auto; /* Crucial: Remove fixed height */
+        overflow: visible; /* Crucial: Remove form-level overflow */
+        flex-grow: unset; /* Allow natural sizing */
+    }
+
+    .form-scrollable-area {
+        overflow-y: visible; /* Crucial: REMOVE INTERNAL SCROLL ON MOBILE */
+        flex-grow: unset; /* Allow natural sizing */
+        padding-right: 0; /* Remove scrollbar padding */
+    }
+
+    /* Existing mobile adjustments (no change needed here) */
     .input-group-row {
         flex-direction: column;
         gap: 0;
@@ -317,8 +352,5 @@ label {
         width: 100%;
         max-width: 300px;
         margin: 0 auto;
-    }
-    .form-container {
-        height: calc(100vh - 180px);
     }
 }

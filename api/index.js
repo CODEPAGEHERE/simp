@@ -9,8 +9,9 @@ const { PrismaClient } = require('@prisma/client');
 
 
 // routes
-const authRoutes = require('./routes/auth');
-const scheduleRoutes = require('./routes/scheduleRoutes');
+const AuthRoutes = require('./routes/AuthRoutes');
+const scheduleRoutes = require('./routes/ScheduleRoutes');
+const DashboardRoutes = require('./routes/DashboardRoutes');
 
 
 
@@ -34,8 +35,9 @@ app.use(express.json()); 
 
 
 // --- API Routes ---
-app.use('/auth', authRoutes); 
+app.use('/auth', AuthRoutes); 
 app.use('/api', scheduleRoutes);
+app.use('/dashboard', DashboardRoutes); 
 
 
 

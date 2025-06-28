@@ -3,22 +3,30 @@ import { Container, Row, Col, Form, Button, Alert, InputGroup } from 'react-boot
 import { Link, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import '../App.css';
-import Navbar from '../components/Navbar';
-import './login.css'; 
+import './login.css';
+import Loader from '../components/Loader'; // Ensure this path is correct
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
     const navigate = useNavigate();
     const formContainerRef = useRef(null);
+    const { login: authContextLogin } = useAuth();
 
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState('');
 
     const API_BASE_URL = import.meta.env.VITE_SIMP_API_POINT;
 
     useEffect(() => {
-        // No logo animation useEffect as logo is removed
+        gsap.fromTo(formContainerRef.current,
+            { opacity: 0, y: 50 },
+            { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
+        );
     }, []);
 
     const handleChange = (e) => {
@@ -28,17 +36,21 @@ const Login = () => {
         } else if (name === 'password') {
             setPassword(value);
         }
-        setMessage('');
+        setMessage(''); // Clear message on input change
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
+        setMessageType('');
+
+        setIsLoading(true);
 
         if (!identifier.trim() || !password.trim()) {
             setMessage('Please enter both your username/phone number and password.');
             setMessageType('danger');
             gsap.to(formContainerRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+            setIsLoading(false);
             return;
         }
 
@@ -51,34 +63,54 @@ const Login = () => {
                 body: JSON.stringify({ identifier, password }),
             });
 
+            // Always attempt to parse the JSON response
             const data = await response.json();
 
             if (response.ok) {
+                // --- Login Success ---
                 setMessage(data.message || 'Login successful!');
                 setMessageType('success');
                 if (data.token) {
-                    // FIX: Store the token with the correct key 'jwtToken'
-                    localStorage.setItem('jwtToken', data.token); // <--- FIX IS HERE!
+                    authContextLogin(data.token, data.person); // Update global auth state
                 }
+
                 setTimeout(() => {
-                    navigate('/dashboard');
+                    setIsLoading(false);
+                    navigate('/dashboard'); // Redirect to dashboard
                 }, 1000);
+
             } else {
-                setMessage(data.message || 'Login failed. Please check your credentials.');
+                // --- Handle Errors ---
+                let errorMessage = 'An unexpected error occurred. Please try again.'; // Default generic message
+
+                // Check for rate limit error (status 429)
+                if (response.status === 429) {
+                    errorMessage = data.Message || 'Too many requests. Please try again later.'; // Use data.Message as defined in RateLimiter.js
+                } else if (response.status === 401) {
+                    // Unauthorized (e.g., invalid credentials)
+                    errorMessage = data.message || 'Invalid username or password.';
+                } else if (data.message) {
+                    // Fallback to message from API if available for other client errors
+                    errorMessage = data.message;
+                }
+
+                setMessage(errorMessage);
                 setMessageType('danger');
                 gsap.to(formContainerRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+                setIsLoading(false);
             }
         } catch (error) {
             console.error('Network or unexpected error during login:', error);
             setMessage('Failed to connect to the server. Please check your connection or try again later.');
             setMessageType('danger');
             gsap.to(formContainerRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+            setIsLoading(false);
         }
     };
 
     return (
         <>
-            <Navbar />
+            {isLoading && <Loader />}
 
             <div className="login-page-background">
                 <Row className="justify-content-center w-100">
@@ -107,13 +139,19 @@ const Login = () => {
                                     <InputGroup>
                                         <InputGroup.Text><i className="bi bi-lock"></i></InputGroup.Text>
                                         <Form.Control
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             name="password"
                                             value={password}
                                             onChange={handleChange}
                                             placeholder="Enter your password"
                                             required
                                         />
+                                        <Button
+                                            variant="outline-secondary"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                                        </Button>
                                     </InputGroup>
                                     <div className="text-end mt-1">
                                         <Link to="/forgot-password" className="text-decoration-none text-dark">
@@ -128,8 +166,13 @@ const Login = () => {
                                     </Alert>
                                 )}
 
-                                <Button variant="secondary" type="submit" className="w-100">
-                                    Login
+                                <Button
+                                    variant="secondary"
+                                    type="submit"
+                                    className="w-100"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? 'Logging In...' : 'Login'}
                                 </Button>
                             </Form>
 

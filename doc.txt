@@ -1,0 +1,213 @@
+Understood! Thank you for the explicit clarification and for outlining the grand vision for the product. This context is incredibly valuable as it shapes every architectural and coding decision we make going forward.
+
+To recap, we're building towards:
+
+* **Massive Scalability:** Aiming for **11,000+ users** at launch and beyond, meaning our choices for backend, database, and frontend architecture must support significant load and growth.
+* **Freemium Model:**
+    * **Free Tier:** Users get core features supported by **non-interrupting Google AdSense banners**.
+    * **Premium Tier ($5/month or $55/year):** Users get an **ad-free experience** and access to **special features** (like file uploads).
+* **Advanced Features:**
+    * **File Uploads:** A critical premium feature.
+    * **Group Scheduling:** Complex multi-user interaction, real-time updates.
+    * **Announcements:** System-wide communication.
+    * **Community Features:** Join/Invite, user relationships.
+    * **User-Specific URLs/Links:** Personalized content access.
+    * **Event Program/Agenda Page:** Structured content for events.
+* **Production-Ready Quality:** This encompasses robust error handling, security, performance optimization, maintainability, and a consistent codebase (like our PascalCase naming convention).
+
+This is a very exciting and ambitious roadmap! The foundational work we're doing now – setting up `ProtectedRoute`, abstracting data fetching with `UseSchedules`, creating a unified `Layout`, and implementing strict naming conventions – directly supports these future goals by building a stable, organized, and scalable base.
+
+Have you had a chance to apply the recent file renames (e.g., `SaveSchedulePage` to `SavedSchedule`, `useSchedules` to `UseSchedules`) and update the code according to the PascalCase guidelines? Once that's complete, we'll be ready for the next tangible step in building out these features.Understood! This is an excellent set of guidelines for a production-ready codebase. Clear, concise, and consistent naming is paramount for maintainability and scalability.
+
+Key Naming Conventions Confirmed:
+
+Definitive, Short, Precise Names: E.g., SavedSchedule instead of SavedSchedulePage.
+PascalCase for ALL Files, Functions, Components, etc.: This will be applied universally across the project.Excellent! Those are solid technology choices that align perfectly with your "full scale" and serverless vision:
+
+* **Cloudinary for Storage:** An outstanding choice for media management (images, videos, etc.). It offloads file storage, transformations, and global delivery (CDNs) from your backend, which is crucial for scalability, especially for features like **file uploads (premium)**.
+* **Vercel (Frontend & Backend):** Keeps your deployment simple, fast, and scalable for both your React app and your Node.js serverless functions.
+* **Neon (Serverless PostgreSQL):** A fantastic modern database that scales automatically with your serverless functions, perfect for handling the data for 11k+ users and growing. Its PostgreSQL compatibility gives you robust relational capabilities.
+
+### Event Program/Agenda Page (Freemium)
+
+Bringing up the **Event Program/Agenda Page** as a freemium feature is a great next concrete step now that our core frontend structure and naming conventions are in place. This will involve working across both your backend and frontend.
+
+Here's a high-level plan for implementing the Event Program/Agenda Page:
+
+**Backend (Vercel Serverless Function & Neon Database):**
+
+1.  **Prisma Schema Update:** Define a new model in your `prisma/schema.prisma` for `Event` (and potentially `AgendaItem`, `Speaker`, etc.) with fields like:
+    * `id`
+    * `title`
+    * `description`
+    * `date` (DateTime)
+    * `startTime` (DateTime or String)
+    * `endTime` (DateTime or String)
+    * `location`
+    * `imageUrl` (for event banner/thumbnail, stored on Cloudinary)
+    * `isPublished` (Boolean, for admin control)
+    * `createdAt`, `updatedAt`
+    * *(Optional: `createdBy` with a relation to your `User` model)*
+2.  **Prisma Migration:** Generate and apply a new migration to update your Neon database schema.
+3.  **API Endpoints:** Create new serverless functions (e.g., in `api/events.js` or `api/routes/eventRoutes.js`) to:
+    * `GET /api/events`: Fetch all (or paginated) published events.
+    * `GET /api/events/:id`: Fetch a single event by ID.
+    * *(Future: `POST /api/events`, `PUT /api/events/:id`, `DELETE /api/events/:id` for admin functionality, likely requiring authentication and admin roles)*
+
+**Frontend (React App):**
+
+1.  **New Page Component:** Create a `src/pages/EventAgenda.jsx` component (or `Events.jsx` following our new naming convention).
+2.  **New Hook (if needed):** A custom hook like `UseEvents.js` (following PascalCase) to fetch event data from your new API endpoints.
+3.  **UI Components:** Design and implement components to display the list of events and a detailed view for a single event (e.g., `EventCard.jsx`, `EventDetail.jsx`).
+4.  **Routing:** Add a new route in `App.jsx` for `/events` (and possibly `/events/:id`). Since it's freemium, this might not be under a `ProtectedRoute` initially, or it might be protected but accessible to all authenticated users.
+
+---
+
+**Shall we start by defining the `Event` schema in your `prisma/schema.prisma` file?** This is the logical first step on the backend.
+Okay, let's take a strategic pause to **refresh and review our entire plan from the ground up**, taking into account all your ambitious goals and the powerful tech stack we're committing to. This is a great idea to ensure we're perfectly aligned for a "full scale" production-ready service.
+
+---
+
+### **Our Vision: A Scalable Freemium Scheduling & Community Platform**
+
+**Target Audience:** 11,000+ users, designed for continuous scaling.
+
+**Core Offerings:**
+* **Scheduling:** Individual and Group scheduling (future).
+* **Community:** Join/Invite features (future).
+* **Content:** Announcements, Event Programs/Agendas.
+
+**Monetization Strategy:**
+* **Freemium Model:**
+    * **Free Tier:** Core features, supported by **non-interrupting Google AdSense banners**.
+    * **Premium Tier ($5/month, $55/year):** Ad-free experience, plus **special features** (e.g., file uploads, advanced group scheduling).
+
+**Key Features (Planned):**
+* Robust User Authentication (Login, Logout, Protected Routes).
+* Personal Saved Schedules.
+* **Group Scheduling:** Collaborative, real-time schedule management.
+* **Announcements:** System-wide or community-specific.
+* **Join/Invite Community:** Social features, user relationships.
+* **User-Specific URLs/Links:** Personalized content (e.g., public profiles, shareable schedules).
+* **Event Program/Agenda Page:** Structured content for events (Freemium).
+* **File Uploads:** (Premium feature, via Cloudinary).
+* Seamless Google AdSense Integration (for Free users).
+* Subscription Management (integration with payment gateway like Stripe).
+
+**Technology Stack:**
+* **Frontend:** React (Vite for tooling)
+* **Backend:** Node.js (Vercel Serverless Functions)
+* **Database:** Neon (Serverless PostgreSQL)
+* **ORM:** Prisma (for database interactions)
+* **File Storage:** Cloudinary (for premium file uploads)
+* **Deployment:** Vercel (for both frontend and backend)
+
+---
+
+### **Current State: Foundation Laid (Phase 1 Complete)**
+
+We've successfully established the critical foundation for this vision:
+
+* **Authentication:** Basic JWT-based login and `ProtectedRoute` are functional.
+* **Data Fetching:** `UseSchedules` hook provides a centralized way to fetch user-specific schedules.
+* **Frontend Structure:** `Layout` component provides a consistent page wrapper and handles global UI elements like the fixed `Nav` bar.
+* **Code Consistency:** Strict PascalCase naming convention applied to components, files, and functions, improving readability and maintainability.
+* **Backend Stability:** Resolved the critical `FUNCTION_INVOCATION_FAILED` error, confirming Vercel Serverless Functions and Neon database connectivity are working.
+
+---
+
+### **Roadmap for Scaling & Feature Implementation (Phased Approach)**
+
+Now that our foundation is solid, we can strategically build out the remaining features. Here's a suggested phased approach, keeping "production-ready" and scalability in mind:
+
+**Phase 2: Core Feature Development & Data Modeling (Next Steps)**
+
+1.  **User Management Enhancement:**
+    * Implement user registration.
+    * Develop user profile management (basic user data).
+    * **Crucially:** Add a `role` or `tier` field (e.g., `free`, `premium`) to the `User` model in Prisma.
+2.  **Event Program/Agenda Page (Freemium):**
+    * **Backend:**
+        * Define `Event` schema in Prisma for Neon.
+        * Create API endpoints for `GET` (all/single) events (accessible to all, as it's freemium).
+    * **Frontend:**
+        * Create `EventAgenda.jsx` page and related components (`EventCard.jsx`, `EventDetail.jsx`).
+        * Implement `UseEvents` hook for data fetching.
+        * Integrate route in `App.jsx`.
+3.  **Centralized API Client (Axios Interceptor):**
+    * Implement a global Axios instance with interceptors for automatic JWT attachment and 401 (unauthorized/expired token) handling. This makes all future API calls cleaner and more robust.
+
+**Phase 3: Premium Features & Monetization**
+
+1.  **Subscription Management Integration:**
+    * Backend integration with a payment gateway (e.g., Stripe) for `$5/month` / `$55/year` subscriptions.
+    * Backend logic to update user `tier` upon successful payment.
+2.  **Premium Feature Flagging:**
+    * Frontend logic to conditionally render or enable/disable premium features based on the user's `tier`.
+    * Implement **File Uploads** (Premium):
+        * Backend API for handling file uploads (integrating with Cloudinary).
+        * Frontend components for file selection and upload.
+        * Add `fileUrl` to relevant schemas (e.g., Schedule, Event).
+3.  **AdSense Integration:**
+    * Create dedicated `AdBanner.jsx` components.
+    * Implement logic to display these components only for `free` tier users and in designated non-interrupting slots within the `Layout` or specific pages.
+
+**Phase 4: Advanced Features & Optimization**
+
+1.  **Group Scheduling:**
+    * Database schema for `Group`, `GroupMembership`, shared `Schedule`.
+    * Real-time capabilities (WebSockets) for live updates.
+    * Complex permissions management.
+2.  **Community Features:**
+    * Database schemas for `Community`, `CommunityMembership`, `Invitations`.
+    * APIs for joining, inviting, leaving.
+3.  **Announcements:**
+    * Database schema for `Announcement`.
+    * Admin API for creating/managing announcements.
+    * Frontend display (global banner, dedicated page).
+4.  **User-Specific URLs:**
+    * Backend logic for unique ID/slug generation.
+    * Frontend dynamic routes.
+5.  **Performance & Security Audits:** Continuous optimization, logging, monitoring.
+
+---
+
+This comprehensive review should put us on a clear path.
+
+**Given this overview, what specific area would you like to tackle next?** Are you ready to start with the **User Management Enhancement** (adding registration and the `tier` to the User model) or would you prefer to jump directly into the **Event Program/Agenda Page** (defining its schema and initial API/UI)?
+Got it! Thanks for the complete rundown of the tech stack. It's crucial to have this definitive list to ensure all our decisions align.
+
+Here's the full tech stack we're working with, integrating the new details:
+
+**Frontend:**
+* **HTML, CSS, JavaScript:** Core web technologies.
+* **React:** For building the user interface.
+* **Vite:** As the build tool and development server for React.
+* **Bootstrap 5:** For responsive design, pre-built UI components, and accelerating development of the user interface.
+* **GSAP (GreenSock Animation Platform):** For advanced, high-performance animations and interactive UI elements, adding polish and dynamic flair.
+* **Default Fine Font:** A stylistic preference for visual appeal.
+
+**Backend:**
+* **Node.js:** Runtime environment.
+* **Express:** Web application framework for building APIs.
+* **Prisma:** Next-generation ORM for database access.
+* **JWT (JSON Web Tokens):** For secure authentication.
+* **bcrypt:** For secure password hashing.
+
+**Database & Storage:**
+* **Neon-DB:** Serverless PostgreSQL database.
+* **Cloudinary:** For cloud-based image and video storage, optimization, and delivery (for file upload features).
+
+**Deployment:**
+* **Vercel:** For seamless hosting and deployment of both frontend and serverless backend functions.
+
+This is a robust and modern stack, well-suited for a scalable, feature-rich application. Bootstrap 5 will help us build UIs quickly, and GSAP will enable stunning animations, enhancing the premium feel.
+
+---
+
+With this clear picture, let's circle back to our roadmap.
+
+We just reviewed the phased approach for building out your features. **What specific area would you like to tackle next?** Are we starting with:
+
+1.  **User Management Enhancement** (registration, adding a `tier` to the User model)?
+2.  Or jumping directly into defining the **Event Program/Agenda Page** (Prisma schema, initial API, basic frontend display)?

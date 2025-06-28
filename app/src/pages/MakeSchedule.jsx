@@ -1,8 +1,10 @@
-// src/pages/MakeSchedule.jsx
+// File: src/pages/MakeSchedule.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Spinner, Alert } from 'react-bootstrap';
-import Nav from '../components/nav';
+import { Alert } from 'react-bootstrap'; // REMOVED Spinner import, kept Alert
+import Loader from '../components/Loader'; // ADDED: Your custom Loader component
+// import Nav from '../components/nav'; // Still REMOVED as per previous explicit instruction
 import '../App.css'; // Assuming this imports global styles
 import './makeschedule.css'; // Your specific styles for this page
 
@@ -16,7 +18,7 @@ const MakeSchedule = () => {
 
     const [subTasks, setSubTasks] = useState([]);
 
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // Controls the loader visibility
     const [responseMessage, setResponseMessage] = useState('');
     const [messageType, setMessageType] = useState('');
 
@@ -27,7 +29,7 @@ const MakeSchedule = () => {
         if (subTasks.length === 0) {
             addSubTask();
         }
-    }, []);
+    }, []); // Empty dependency array means this runs once on mount
 
     // Helper to convert duration object to total seconds for CLIENT-SIDE validation
     const convertDurationToSeconds = (durationObj) => {
@@ -47,11 +49,12 @@ const MakeSchedule = () => {
     };
 
     // --- Event Handlers for Input Changes ---
-    const handleLogout = () => {
-        console.log("DEBUG(MakeSchedule): Attempting to log out.");
-        localStorage.removeItem('jwtToken');
-        navigate('/login');
-    };
+    // handleLogout is removed as Nav component is not present.
+    // const handleLogout = () => {
+    //     console.log("DEBUG(MakeSchedule): Attempting to log out.");
+    //     localStorage.removeItem('jwtToken');
+    //     navigate('/login');
+    // };
 
     const handleMainTaskNameChange = (e) => {
         setMainTask((prevTask) => ({
@@ -142,7 +145,7 @@ const MakeSchedule = () => {
 
     // --- Core API Submission Logic ---
     const sendSaveScheduleToBackend = async (redirectAfterSave = false) => {
-        setIsLoading(true);
+        setIsLoading(true); // Show loader
         setResponseMessage('');
         setMessageType('');
 
@@ -150,7 +153,7 @@ const MakeSchedule = () => {
         if (!token) {
             setResponseMessage('Authentication required. Please log in.');
             setMessageType('danger');
-            setIsLoading(false);
+            setIsLoading(false); // Hide loader
             navigate('/login');
             return;
         }
@@ -159,7 +162,7 @@ const MakeSchedule = () => {
         if (!mainTask.name.trim()) {
             setResponseMessage('Main task name is required.');
             setMessageType('danger');
-            setIsLoading(false);
+            setIsLoading(false); // Hide loader
             return;
         }
 
@@ -167,14 +170,14 @@ const MakeSchedule = () => {
         if (totalDurationSecondsForValidation === null) {
             setResponseMessage('Main task duration has invalid minutes or seconds (0-59 allowed for MM/SS).');
             setMessageType('danger');
-            setIsLoading(false);
+            setIsLoading(false); // Hide loader
             return;
         }
         if (mainTask.name.trim() && totalDurationSecondsForValidation === 0 &&
             (mainTask.totalDuration.hh === '' && mainTask.totalDuration.mm === '' && mainTask.totalDuration.ss === '')) {
             setResponseMessage('Main task with a name requires a total duration (HH:MM:SS).');
             setMessageType('danger');
-            setIsLoading(false);
+            setIsLoading(false); // Hide loader
             return;
         }
 
@@ -185,7 +188,7 @@ const MakeSchedule = () => {
             if (!sub.name.trim()) {
                 setResponseMessage('All sub-task names are required.');
                 setMessageType('danger');
-                setIsLoading(false);
+                setIsLoading(false); // Hide loader
                 return;
             }
 
@@ -193,14 +196,14 @@ const MakeSchedule = () => {
             if (subTaskDurationSecondsForValidation === null) {
                 setResponseMessage(`Sub-task "${sub.name}" has invalid minutes or seconds (0-59 allowed for MM/SS).`);
                 setMessageType('danger');
-                setIsLoading(false);
+                setIsLoading(false); // Hide loader
                 return;
             }
             if (sub.name.trim() && subTaskDurationSecondsForValidation === 0 &&
                 (sub.duration.hh === '' && sub.duration.mm === '' && sub.duration.ss === '')) {
                 setResponseMessage(`Sub-task "${sub.name}" requires an allocated time (HH:MM:SS).`);
                 setMessageType('danger');
-                setIsLoading(false);
+                setIsLoading(false); // Hide loader
                 return;
             }
 
@@ -215,7 +218,7 @@ const MakeSchedule = () => {
         if (sumOfSubTaskDurations > totalDurationSecondsForValidation) {
             setResponseMessage('The total duration of all sub-tasks cannot exceed the main schedule\'s total duration.');
             setMessageType('danger');
-            setIsLoading(false);
+            setIsLoading(false); // Hide loader
             return;
         }
 
@@ -228,6 +231,9 @@ const MakeSchedule = () => {
         };
 
         try {
+            // NOTE: API endpoint is still /api as per your provided code.
+            // If it should be /schedules, you would need to manually change this here
+            // and ensure your backend's server.js maps /schedules to ScheduleRoutes.
             const response = await fetch(`${API_BASE_URL}/api`, {
                 method: 'POST',
                 headers: {
@@ -267,7 +273,7 @@ const MakeSchedule = () => {
             setResponseMessage('Network error or server unavailable. Please try again.');
             setMessageType('danger');
         } finally {
-            setIsLoading(false);
+            setIsLoading(false); // Hide loader regardless of success or failure
         }
     };
 
@@ -283,11 +289,11 @@ const MakeSchedule = () => {
 
     return (
         <div>
-            <Nav onLogout={handleLogout} />
+            {/* Conditional Full-Screen Loader: Renders only when isLoading is true */}
+            {isLoading && <Loader />} 
 
             <div className="make-schedule-page-content">
                 <div className="form-container">
-                    {/* These elements are OUTSIDE the scrolling form content, so they stay fixed at the top of the form container */}
                     <h2 className="form-heading">Create Schedule</h2>
 
                     {responseMessage && (
@@ -296,9 +302,7 @@ const MakeSchedule = () => {
                         </Alert>
                     )}
 
-                    {/* The <form> tag itself is now a flex container */}
                     <form className="main-schedule-form">
-                        {/* THIS DIV IS NOW THE SCROLLABLE AREA */}
                         <div className="form-scrollable-area">
                             {/* Main Task Name and Total Duration */}
                             <div className="input-group-row">
@@ -377,8 +381,7 @@ const MakeSchedule = () => {
                             </button>
                         </div> {/* END of form-scrollable-area */}
 
-                        {/* Buttons for Save and Start - These will stay fixed at the bottom of the form */}
-                        <hr className="bold-hr" /> {/* Placed outside scrollable area for fixed position */}
+                        <hr className="bold-hr" />
                         <div className="button-group">
                             <button
                                 type="submit"
@@ -386,8 +389,8 @@ const MakeSchedule = () => {
                                 className="save-button"
                                 disabled={isLoading}
                             >
-                                {isLoading && !responseMessage ? (
-                                    <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                                {isLoading ? (
+                                    'Saving...' // Display text while loading, as Loader is an overlay
                                 ) : (
                                     'Save Schedule'
                                 )}
@@ -398,8 +401,8 @@ const MakeSchedule = () => {
                                 className="start-button"
                                 disabled={isLoading}
                             >
-                                {isLoading && !responseMessage ? (
-                                    <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                                {isLoading ? (
+                                    'Starting...' // Display text while loading
                                 ) : (
                                     'Start Schedule Now'
                                 )}

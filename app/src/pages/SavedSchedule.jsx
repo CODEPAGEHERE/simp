@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Nav from '../components/nav'; // Ensure this path is correct
+// import Nav from '../components/nav'; // REMOVED: Nav component
 import ScheduleListItem from '../components/ScheduleListItem';
+import Loader from '../components/Loader'; // ADDED: Your custom Loader component
 import './SaveSchedule.css';
 
 const SaveSchedulePage = () => {
@@ -118,9 +119,8 @@ const SaveSchedulePage = () => {
     // Render Logic for Loading/Error states
     if (loading) {
         return (
-            <div className="save-schedule-loading-state">
-                <p>Loading your schedules...</p>
-            </div>
+            // Replaced the text message with your Loader component
+            <Loader />
         );
     }
 
@@ -136,12 +136,11 @@ const SaveSchedulePage = () => {
     // Main Page Content
     return (
         <>
-            <Nav />
+            {/* REMOVED: <Nav /> */}
 
             <div className="save-schedule-page-wrapper">
                 <div className="save-schedule-page-content">
-              
-
+               
                     {/* --- Recent Schedules Section --- */}
                     <div className="recent-schedules-section">
                         <h2 className="section-title">Recently </h2>

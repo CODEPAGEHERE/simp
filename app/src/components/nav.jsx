@@ -1,65 +1,88 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import './Navbar.css'; // Custom CSS for Navbar
+import './Nav.css';
+import { useAuth } from '../context/AuthContext'; // Import useAuth hook
 
-// Accept onLogout prop
-const Nav = ({ onLogout }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State to manage mobile menu visibility
+const Nav = () => {
+    // Use the useAuth hook to get isAuthenticated and the logout function
+    const { isAuthenticated, logout } = useAuth();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
 
-  const handleLogoutClick = () => {
-    if (onLogout) {
-      onLogout(); // Call the passed-in logout function
-    }
-    setIsMenuOpen(false); // Close the menu after logout
-  };
+    const handleLogoutClick = () => {
+        logout(); // Call the logout function from context
+        setIsMenuOpen(false); // Close mobile menu after logout
+    };
 
-  return (
-    <nav className="simp-navbar">
-      <div className="simp-navbar-inner"> {/* This container is key for desktop margins */}
-        <div className="simp-navbar-brand">
-          <Link to="/dashboard">
-            <img src="/logoh.png" alt="Simp Logo" className="logo-icon" />
-            <span className="logo-text">Simp</span>
-          </Link>
-        </div>
+    // Close mobile menu if user logs out while it's open (e.g., from another tab)
+    useEffect(() => {
+        if (!isAuthenticated && isMenuOpen) {
+            setIsMenuOpen(false);
+        }
+    }, [isAuthenticated, isMenuOpen]);
 
-        {/* Hamburger Icon - Visible only on mobile, hides on desktop */}
-        <button
-          className={`hamburger-menu-button ${isMenuOpen ? 'active' : ''}`}
-          onClick={toggleMenu}
-          aria-label="Toggle navigation menu"
-        >
-          <span className="hamburger-line"></span>
-          <span className="hamburger-line"></span>
-          <span className="hamburger-line"></span>
-        </button>
+    return (
+        <nav className="simp-navbar">
+            <div className="simp-navbar-inner">
+                <div className="simp-navbar-brand">
+                    <Link to={isAuthenticated ? "/dashboard" : "/"}>
+                        <img src="/logoh.png" alt="Simp Logo" className="logo-icon" />
+                        <span className="logo-text">Simp</span>
+                    </Link>
+                </div>
 
-        {/* Navigation and Auth sections */}
-        {/* simp-navbar-nav will be the vertical dropdown on mobile, horizontal on desktop */}
-        <ul className={`simp-navbar-nav ${isMenuOpen ? 'open' : ''}`}>
-          <li><Link to="/make-schedule" onClick={() => setIsMenuOpen(false)}>Make Schedule</Link></li>
-          <li><Link to="/ongoing-schedule" onClick={() => setIsMenuOpen(false)}>Ongoing Schedule</Link></li>
-          <li><Link to="/saved-schedule" onClick={() => setIsMenuOpen(false)}>Saved Schedule</Link></li>
-          <li><Link to="/settings" onClick={() => setIsMenuOpen(false)}>Setting</Link></li>
-          <li><Link to="/help" onClick={() => setIsMenuOpen(false)}>Help</Link></li>
-          {/* Removed: <li><Link to="/login" onClick={() => setIsMenuOpen(false)}>Login</Link></li> */}
+                <button
+                    className={`hamburger-menu-button ${isMenuOpen ? 'active' : ''}`}
+                    onClick={toggleMenu}
+                    aria-label="Toggle navigation menu"
+                >
+                    <span className="hamburger-line"></span>
+                    <span className="hamburger-line"></span>
+                    <span className="hamburger-line"></span>
+                </button>
 
-          {/* Mobile-only Logout Button - this will be part of the vertical dropdown */}
-          <li className="mobile-auth-item">
-            <button className="btn simp-btn-logout-mobile" onClick={handleLogoutClick}>Logout</button>
-          </li>
-        </ul>
-        {/* Desktop-only Logout Button */}
-        <div className="simp-navbar-auth">
-          <button className="btn btn-outline-dark simp-btn-logout" onClick={handleLogoutClick}>Logout</button>
-        </div>
-      </div>
-    </nav>
-  );
+                <ul className={`simp-navbar-nav ${isMenuOpen ? 'open' : ''}`}>
+                    {/* These links are always available */}
+                    <li><Link to="/make-schedule" onClick={() => setIsMenuOpen(false)}>Make Schedule</Link></li>
+                    <li><Link to="/ongoing-schedule" onClick={() => setIsMenuOpen(false)}>Ongoing Schedule</Link></li>
+                    <li><Link to="/saved-schedule" onClick={() => setIsMenuOpen(false)}>Saved Schedule</Link></li>
+                    <li><Link to="/settings" onClick={() => setIsMenuOpen(false)}>Setting</Link></li>
+                    <li><Link to="/help" onClick={() => setIsMenuOpen(false)}>Help</Link></li>
+
+                    {/* Conditional rendering for Auth buttons in mobile menu */}
+                    {isAuthenticated ? (
+                        <li className="mobile-auth-item">
+                            <button className="btn simp-btn-logout-mobile" onClick={handleLogoutClick}>Logout</button>
+                        </li>
+                    ) : (
+                        <>
+                            <li className="mobile-auth-item">
+                                <Link to="/login" className="btn simp-btn-login-mobile" onClick={() => setIsMenuOpen(false)}>Login</Link>
+                            </li>
+                            <li className="mobile-auth-item">
+                                <Link to="/register" className="btn simp-btn-signup-mobile" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
+                            </li>
+                        </>
+                    )}
+                </ul>
+
+                {/* Desktop-only Auth buttons */}
+                <div className="simp-navbar-auth">
+                    {isAuthenticated ? (
+                        <button className="btn btn-outline-dark simp-btn-logout" onClick={handleLogoutClick}>Logout</button>
+                    ) : (
+                        <>
+                            <Link to="/login" className="btn btn-outline-dark simp-btn-login">Login</Link>
+                            <Link to="/register" className="btn btn-outline-dark simp-btn-signup">Sign Up</Link>
+                        </>
+                    )}
+                </div>
+            </div>
+        </nav>
+    );
 };
 
 export default Nav;

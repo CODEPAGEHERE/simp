@@ -1,15 +1,14 @@
 .signup-page-wrapper {
-  min-height: 100vh;
   display: flex; 
   flex-direction: column; 
 }
 
 
 .signup-content-offset {
-  padding-top: 70px; 
   flex-grow: 1; 
   display: flex; 
   align-items: center; 
   justify-content: center; 
+  margin-top:-30px;
 }
 
