@@ -1,71 +1,65 @@
 // File: backend/controllers/DashboardController.js
 
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const Prisma = new PrismaClient();
 
 const DashboardController = {
-    GetDashboardSchedules: async (req, res) => {
+    GetDashboardSchedules: async (Req, Res) => {
         try {
-            const userId = req.user.userId;
+            const UserId = Req.User.UserId;
 
-            if (!userId) {
-                return res.status(401).json({ error: 'Unauthorized: User ID not found in token.' });
+            if (!UserId) {
+                return Res.status(401).json({ Error: 'Unauthorized: User ID not found in token.' });
             }
 
-            // Calculate date ranges relative to the current time
-            const now = new Date();
-            const startOfToday = new Date(now);
-            startOfToday.setHours(0, 0, 0, 0); // Start of today
+            const Now = new Date();
+            const StartOfToday = new Date(Now);
+            StartOfToday.setHours(0, 0, 0, 0);
 
-            const endOfNextSevenDays = new Date(now);
-            endOfNextSevenDays.setDate(now.getDate() + 7);
-            endOfNextSevenDays.setHours(23, 59, 59, 999); // End of 7 days from now
+            const EndOfNextSevenDays = new Date(Now);
+            EndOfNextSevenDays.setDate(Now.getDate() + 7);
+            EndOfNextSevenDays.setHours(23, 59, 59, 999);
 
-            const startOfThreeDaysAgo = new Date(now);
-            startOfThreeDaysAgo.setDate(now.getDate() - 3);
-            startOfThreeDaysAgo.setHours(0, 0, 0, 0); // Start of 3 days ago
+            const StartOfThreeDaysAgo = new Date(Now);
+            StartOfThreeDaysAgo.setDate(Now.getDate() - 3);
+            StartOfThreeDaysAgo.setHours(0, 0, 0, 0);
 
-            // Removed 'endOfYesterday' as it was not being utilized in the queries.
-
-            // Fetch schedules starting within the next 7 days (including today)
-            const next7DaysSchedules = await prisma.schedule.findMany({
+            const Next7DaysSchedules = await Prisma.schedule.findMany({
                 where: {
-                    personId: userId,
-                    startDate: { // Assuming 'startDate' is used for future schedules
-                        gte: startOfToday,
-                        lte: endOfNextSevenDays,
+                    PersonId: UserId,
+                    StartDate: {
+                        gte: StartOfToday,
+                        lte: EndOfNextSevenDays,
                     },
                 },
                 orderBy: {
-                    startDate: 'asc', // Order by start date ascending
+                    StartDate: 'asc',
                 },
-                include: { subTasks: true },
+                include: { SubTasks: true },
             });
 
-            // Fetch schedules created within the past 3 days (excluding today)
-            const past3DaysSchedules = await prisma.schedule.findMany({
+            const Past3DaysSchedules = await Prisma.schedule.findMany({
                 where: {
-                    personId: userId,
-                    createdAt: { // Assuming 'createdAt' is used for past schedules
-                        gte: startOfThreeDaysAgo,
-                        lt: startOfToday, // Up to the beginning of today
+                    PersonId: UserId,
+                    CreatedAt: {
+                        gte: StartOfThreeDaysAgo,
+                        lt: StartOfToday,
                     },
                 },
                 orderBy: {
-                    createdAt: 'desc', // Order by creation date descending
+                    CreatedAt: 'desc',
                 },
-                include: { subTasks: true },
+                include: { SubTasks: true },
             });
 
-            // Respond with both sets of schedules
-            res.status(200).json({
-                next7Days: next7DaysSchedules,
-                past3Days: past3DaysSchedules,
+            Res.status(200).json({
+                Next7Days: Next7DaysSchedules,
+                Past3Days: Past3DaysSchedules,
             });
 
-        } catch (error) {
-            console.error('Error fetching dashboard schedules:', error);
-            res.status(500).json({ error: 'Failed to retrieve dashboard schedules.', details: error.message });
+        } catch (Error) {
+            console.error('Error fetching dashboard schedules:', Error);
+            Res.status(500).json({ Error: 'Failed to retrieve dashboard schedules.', Details: Error.Message });
         }
     },
 };

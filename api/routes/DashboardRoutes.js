@@ -1,11 +1,11 @@
-// This file: backend/routes/DashboardRoutes.js
+// File: backend/routes/DashboardRoutes.js
 
-const express = require('express');
-const router = express.Router();
+const Express = require('express');
+const Router = Express.Router();
 
-const DashboardController = require('../controllers/DashboardController'); // PascalCase import
-const { protect } = require('../middleware/authmiddleware');
+const DashboardController = require('../controllers/DashboardController');
+const Protect = require('../middleware/AuthMiddleware'); // Corrected import to match default export and PascalCase
 
-router.get('/', protect, DashboardController.GetDashboardSchedules); // PascalCase function call
+Router.get('/', Protect, DashboardController.GetDashboardSchedules); // Using PascalCase for Router and Protect
 
-module.exports = router;
+module.exports = Router;

@@ -1,75 +1,62 @@
+// File: backend/index.js
+
 // Conditionally load dotenv for local development only
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
-const express = require('express');
-const cors = require('cors');
-const { PrismaClient } = require('@prisma/client');
 
+const Express = require('express'); // Changed to PascalCase
+const Cors = require('cors');       // Changed to PascalCase
+const { PrismaClient } = require('@prisma/client'); // PrismaClient already PascalCase, no change
 
+// Routes - These will be updated to reflect their PascalCase file names and internal variables
+const AuthRoutes = require('./routes/AuthRoutes');         // Will assume AuthRoutes.js exists
+const ScheduleRoutes = require('./routes/ScheduleRoutes'); // Will assume ScheduleRoutes.js exists
+const DashboardRoutes = require('./routes/DashboardRoutes'); // Will assume DashboardRoutes.js exists
 
-// routes
-const AuthRoutes = require('./routes/AuthRoutes');
-const scheduleRoutes = require('./routes/ScheduleRoutes');
-const DashboardRoutes = require('./routes/DashboardRoutes');
-
-
-
-const app = express();
-const prisma = new PrismaClient(); 
+const App = Express(); // Changed to PascalCase
+const Prisma = new PrismaClient(); // Changed to PascalCase
 
 // --- UPDATED CORS CONFIGURATION using environment variable ---
-const allowedOrigin = process.env.CORS_ORIGIN 
+const AllowedOrigin = process.env.CORS_ORIGIN; // Changed to PascalCase
 
-app.use(cors({
-    origin: allowedOrigin, // Use the environment variable here
+App.use(Cors({
+    origin: AllowedOrigin, // Using PascalCase variable here
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
 // --- END UPDATED CORS CONFIGURATION ---
 
-
-app.use(express.json()); 
-
-
-
+App.use(Express.json()); // Changed to PascalCase
 
 // --- API Routes ---
-app.use('/auth', AuthRoutes); 
-app.use('/api', scheduleRoutes);
-app.use('/dashboard', DashboardRoutes); 
+App.use('/auth', AuthRoutes);
+App.use('/api', ScheduleRoutes);
+App.use('/dashboard', DashboardRoutes);
 
-
-
-
-
-
-app.get('/', (req, res) => {
-  res.status(200).json({ message: 'API is running successfully!' });
+App.get('/', (Req, Res) => { // Changed parameters to PascalCase
+    Res.status(200).json({ Message: 'API is running successfully!' }); // Changed Message to PascalCase
 });
 
-
-app.use((err, req, res, next) => {
-  console.error(err.stack); 
-  res.status(500).send('Something broke on the server!');
+// Error handling middleware
+App.use((Err, Req, Res, Next) => { // Changed parameters to PascalCase
+    console.error(Err.stack);
+    Res.status(500).send('Something broke on the server!');
 });
 
-module.exports = app;
-
-
-
+module.exports = App; // Exporting the PascalCase App
 
 if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT ;
-  app.listen(PORT, () => {
-    console.log(`Backend server running on http://localhost:${PORT}`);
-	
-    prisma.$connect()
-      .then(() => console.log("Db connected successfully (Neon with Prisma)."))
-      .catch((e) => console.error("Db connection error:", e));
-  });
+    const Port = process.env.PORT; // Changed to PascalCase
+    App.listen(Port, () => {
+        console.log(`Backend server running on http://localhost:${Port}`);
+
+        Prisma.$connect()
+            .then(() => console.log("Db connected successfully (Neon with Prisma)."))
+            .catch((E) => console.error("Db connection error:", E)); // Changed parameter to PascalCase
+    });
 }
 
 process.on('beforeExit', async () => {
-  await prisma.$disconnect();
+    await Prisma.$disconnect();
 });

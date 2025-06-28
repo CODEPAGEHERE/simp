@@ -1,25 +1,24 @@
-const jwt = require('jsonwebtoken');
+// File: backend/middleware/AuthMiddleware.js
 
-const authMiddleware = (req, res, next) => {
-  // Get token from Authorization header (Bearer token)
-  let token = req.headers.authorization;
+const Jwt = require('jsonwebtoken');
 
-  if (!token || !token.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'No token, authorization denied' });
-  }
+const AuthMiddleware = (Req, Res, Next) => {
+    let Token = Req.headers.authorization;
 
-  // Extract the token part (remove "Bearer ")
-  token = token.slice(7, token.length).trimLeft();
+    if (!Token || !Token.startsWith('Bearer ')) {
+        return Res.status(401).json({ Message: 'No token, authorization denied' });
+    }
 
-  try {
-    // Verify the token using your JWT_SECRET
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.userId; // Attach the decoded user ID to the request object
-    next(); // Proceed to the next middleware/route handler
-  } catch (err) {
-    console.error("JWT verification error:", err.message);
-    res.status(401).json({ message: 'Token is not valid' });
-  }
+    Token = Token.slice(7).trim();
+
+    try {
+        const Decoded = Jwt.verify(Token, process.env.JWT_SECRET);
+        Req.User = { UserId: Decoded.UserId }; // Critical change for req.user.userId consistency
+        Next();
+    } catch (Err) {
+        console.error("JWT verification error:", Err.Message);
+        Res.status(401).json({ Message: 'Token is not valid' });
+    }
 };
 
-module.exports = authMiddleware;
+module.exports = AuthMiddleware;

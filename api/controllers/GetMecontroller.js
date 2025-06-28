@@ -12,8 +12,10 @@ const GetMeController = {
      */
     GetMe: async (req, res) => {
         try {
-            // The userId is attached to req.user by the 'protect' middleware after validating the JWT
-            const userId = req.user.userId;
+            // IMPORTANT: Ensure your middleware sets req.user.userId consistently
+            // The middleware you provided attaches userId directly to req.userId.
+            // Let's adjust this to req.user.userId to match your controller's expectation.
+            const userId = req.user.userId; 
 
             if (!userId) {
                 return res.status(401).json({ error: 'Unauthorized: User ID not found in token payload.' });
@@ -45,4 +47,4 @@ const GetMeController = {
     },
 };
 
-module.exports = GetMeController; // Export the controller object
+module.exports = GetMeController; // Correct: Export the controller object

@@ -1,19 +1,16 @@
-// backend/routes/scheduleRoutes.js
-const express = require('express');
-const router = express.Router();
+// File: backend/routes/scheduleRoutes.js
 
-const { Schedule } = require('../controllers/schedulecontroller');
-const authMiddleware = require('../middleware/authmiddleware'); // authMiddleware is already a function here
+const Express = require('express');
+const Router = Express.Router();
 
-// --- Define Schedule Routes ---
+const ScheduleController = require('../controllers/ScheduleController');
 
-// Route to create a new schedule (POST request, requires authentication)
-router.post('/', authMiddleware, Schedule.createSchedule);
+const AuthMiddleware = require('../middleware/AuthMiddleware'); // Changed to PascalCase
 
-// NEW: Route to get all schedules for the authenticated user
-router.get('/schedules/user', authMiddleware, Schedule.getSchedulesForUser);
+Router.post('/', AuthMiddleware, ScheduleController.CreateSchedule);
 
-// NEW: Route to delete a specific schedule by ID
-router.delete('/schedules/:id', authMiddleware, Schedule.deleteSchedule);
+Router.get('/schedules/user', AuthMiddleware, ScheduleController.GetSchedulesForUser);
 
-module.exports = router;
+Router.delete('/schedules/:id', AuthMiddleware, ScheduleController.DeleteSchedule);
+
+module.exports = Router;
