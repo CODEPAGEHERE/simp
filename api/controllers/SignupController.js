@@ -1,5 +1,3 @@
-// File: backend/controllers/SignupController.js
-
 const { PrismaClient } = require('@prisma/client');
 const Bcrypt = require('bcryptjs');
 

@@ -1,3 +1,5 @@
+// File: frontend/src/pages/Login.jsx
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Alert, InputGroup } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
@@ -10,7 +12,8 @@ import { useAuth } from '../context/AuthContext';
 const Login = () => {
     const Navigate = useNavigate();
     const FormContainerRef = useRef(null);
-    const { login: AuthContextLogin } = useAuth();
+    const { Login: AuthContextLogin } = useAuth(); // FIXED: AuthContext's function is named 'Login' (PascalCase)
+                                                   // Keeping your alias 'AuthContextLogin' but pointing to correct source.
 
     const [Identifier, setIdentifier] = useState('');
     const [Password, setPassword] = useState('');
@@ -69,7 +72,7 @@ const Login = () => {
                 setMessage(Data.Message || 'Login successful!');
                 setMessageType('success');
                 if (Data.Token) {
-                    AuthContextLogin(Data.Token, Data.Person);
+                    AuthContextLogin(Data.Token, Data.Person); // Calling the correctly aliased function
                 }
 
                 setTimeout(() => {

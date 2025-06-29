@@ -15,7 +15,6 @@ const GetMeController = {
                 select: {
                     id: true,
                     username: true,
-                    email: true,
                     name: true,
                     phoneNo: true,
                     createdAt: true,

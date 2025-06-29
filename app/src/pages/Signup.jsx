@@ -1,3 +1,5 @@
+// File: frontend/src/pages/Signup.jsx
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, Alert, InputGroup } from 'react-bootstrap';
 import { gsap } from 'gsap';
@@ -81,7 +83,7 @@ const Signup = () => {
 
         const AllowedPasswordCharsRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]+$/;
         if (Password.length < 10) {
-            setMessage('Password must be at least 9 characters long.');
+            setMessage('Password must be at least 10 characters long.');
             setMessageType('danger');
             gsap.to(PageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
             setIsLoading(false);
@@ -108,13 +110,13 @@ const Signup = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ Name: Name, PhoneNo: PhoneNo, Username: Username, Password: Password }) // FIX: Changed keys to PascalCase
+                body: JSON.stringify({ Name: Name, PhoneNo: PhoneNo, Username: Username, Password: Password })
             });
 
-            const Data = await Response.json(); // Changed 'data' to 'Data'
+            const Data = await Response.json();
 
             if (Response.ok) {
-                setMessage(Data.Message || 'Signup successful! Redirecting to login...'); // FIX: Changed 'data.message' to 'Data.Message'
+                setMessage(Data.Message || 'Signup successful! Redirecting to login...');
                 setMessageType('success');
                 setName('');
                 setPhoneNo('+234');
@@ -128,12 +130,12 @@ const Signup = () => {
                 }, 2000);
 
             } else {
-                setMessage(Data.Message || 'An error occurred during signup.'); // FIX: Changed 'data.message' to 'Data.Message'
+                setMessage(Data.Message || 'An error occurred during signup.');
                 setMessageType('danger');
                 gsap.to(PageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
                 setIsLoading(false);
             }
-        } catch (Error) { // Changed 'error' to 'Error'
+        } catch (Error) {
             console.error('Network or unexpected error:', Error);
             setMessage('Failed to connect to the server. Please check your internet connection or try again later.');
             setMessageType('danger');
@@ -240,7 +242,7 @@ const Signup = () => {
                                                 )}
                                                 {!PasswordValidationMessage && (
                                                     <Form.Text className="text-muted">
-                                                        
+                                                        {/* Placeholder for spacing, or add a hint if needed */}
                                                     </Form.Text>
                                                 )}
                                             </Form.Group>

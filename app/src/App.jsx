@@ -1,14 +1,10 @@
-// src/App.jsx
-
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
 
-
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Keep all these imports, but verify their PascalCase consistency below!
 import Home from './pages/Home';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
@@ -25,18 +21,15 @@ const ForgotPassword = () => (
 
 function App() {
     return (
-        // REMOVE THE <AuthProvider> AND </AuthProvider> TAGS HERE
-        // The Layout component will now be the direct child of the App component's return.
         <Layout>
             <Routes>
                 {/* Public Routes */}
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Home/>} /> 
                 <Route path="/register" element={<Signup />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
 
                 {/* Protected Routes */}
-                {/* ProtectedRoute should wrap the OUTLET for nested routes */}
                 <Route element={<ProtectedRoute />}>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/make-schedule" element={<MakeSchedule />} />

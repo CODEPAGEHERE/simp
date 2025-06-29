@@ -1,11 +1,12 @@
+// File: frontend/src/components/Nav.jsx
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './Nav.css';
-import { useAuth } from '../context/AuthContext'; // Import useAuth hook
+import { useAuth } from '../context/AuthContext';
 
 const Nav = () => {
-    // Use the useAuth hook to get isAuthenticated and the logout function
-    const { isAuthenticated, logout } = useAuth();
+    const { IsAuthenticated, Logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleMenu = () => {
@@ -13,22 +14,21 @@ const Nav = () => {
     };
 
     const handleLogoutClick = () => {
-        logout(); // Call the logout function from context
-        setIsMenuOpen(false); // Close mobile menu after logout
+        Logout();
+        setIsMenuOpen(false);
     };
 
-    // Close mobile menu if user logs out while it's open (e.g., from another tab)
     useEffect(() => {
-        if (!isAuthenticated && isMenuOpen) {
+        if (!IsAuthenticated && isMenuOpen) {
             setIsMenuOpen(false);
         }
-    }, [isAuthenticated, isMenuOpen]);
+    }, [IsAuthenticated, isMenuOpen]);
 
     return (
         <nav className="simp-navbar">
             <div className="simp-navbar-inner">
                 <div className="simp-navbar-brand">
-                    <Link to={isAuthenticated ? "/dashboard" : "/"}>
+                    <Link to={IsAuthenticated ? "/dashboard" : "/"}>
                         <img src="/logoh.png" alt="Simp Logo" className="logo-icon" />
                         <span className="logo-text">Simp</span>
                     </Link>
@@ -53,7 +53,7 @@ const Nav = () => {
                     <li><Link to="/help" onClick={() => setIsMenuOpen(false)}>Help</Link></li>
 
                     {/* Conditional rendering for Auth buttons in mobile menu */}
-                    {isAuthenticated ? (
+                    {IsAuthenticated ? (
                         <li className="mobile-auth-item">
                             <button className="btn simp-btn-logout-mobile" onClick={handleLogoutClick}>Logout</button>
                         </li>
@@ -71,7 +71,7 @@ const Nav = () => {
 
                 {/* Desktop-only Auth buttons */}
                 <div className="simp-navbar-auth">
-                    {isAuthenticated ? (
+                    {IsAuthenticated ? (
                         <button className="btn btn-outline-dark simp-btn-logout" onClick={handleLogoutClick}>Logout</button>
                     ) : (
                         <>

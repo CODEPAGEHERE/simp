@@ -1,5 +1,3 @@
-// File: backend/controllers/LoginController.js
-
 const { PrismaClient } = require('@prisma/client');
 const Bcrypt = require('bcryptjs');
 const Jwt = require('jsonwebtoken');

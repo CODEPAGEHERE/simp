@@ -1,3 +1,5 @@
+// File: backend/controllers/DashboardController.js
+
 const { PrismaClient } = require('@prisma/client');
 const Prisma = new PrismaClient();
 

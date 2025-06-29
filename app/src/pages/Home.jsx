@@ -1,12 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../App.css'; // Global app styles
-import './Home.css'; // Home-specific styles
+import '../App.css';
+import './Home.css';
 
 const Home = () => {
     return (
         <div className="landing-page-wrapper">
-
             <div className="landing-main-content">
                 <div className="main-logo-icon-container">
                     <img src="/logoh.png" alt="Simp Logo" className="main-logo-icon" />

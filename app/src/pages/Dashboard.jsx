@@ -1,5 +1,3 @@
-// This file: frontend/src/pages/Dashboard.jsx
-
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Spinner, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
