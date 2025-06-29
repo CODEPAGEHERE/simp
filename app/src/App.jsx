@@ -1,13 +1,14 @@
+// src/App.jsx
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
 
-// Import the AuthProvider to wrap the entire application
-import { AuthProvider } from './context/AuthContext';
 
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 
+// Keep all these imports, but verify their PascalCase consistency below!
 import Home from './pages/Home';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
@@ -23,41 +24,33 @@ const ForgotPassword = () => (
 );
 
 function App() {
-    // Removed:
-    // const navigate = useNavigate();
-    // const [isAuthenticated, setIsAuthenticated] = useState(false);
-    // useEffect to check token on mount
-    // HandleLogout function
-
     return (
-        // Wrap your entire application with AuthProvider.
-        // This makes the AuthContext available to all nested components.
-        <AuthProvider>
-            {/* Layout no longer needs isAuthenticated or onLogout props passed from App */}
-            <Layout>
-                <Routes>
-                    {/* Public Routes */}
-                    <Route path="/" element={<Home />} />
-                    <Route path="/register" element={<Signup />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
+        // REMOVE THE <AuthProvider> AND </AuthProvider> TAGS HERE
+        // The Layout component will now be the direct child of the App component's return.
+        <Layout>
+            <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/register" element={<Signup />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
 
-                    {/* Protected Routes */}
-                    <Route element={<ProtectedRoute />}>
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/make-schedule" element={<MakeSchedule />} />
-                        <Route path="/saved-schedule" element={<SavedSchedule />} />
+                {/* Protected Routes */}
+                {/* ProtectedRoute should wrap the OUTLET for nested routes */}
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/make-schedule" element={<MakeSchedule />} />
+                    <Route path="/saved-schedule" element={<SavedSchedule />} />
 
-                        {/* Add more protected routes here */}
-                        <Route path="/schedule/:id" element={<div>Schedule Detail (Protected)</div>} />
-                        <Route path="/schedule/edit/:id" element={<div>Schedule Edit (Protected)</div>} />
-                    </Route>
+                    {/* Add more protected routes here */}
+                    <Route path="/schedule/:id" element={<div>Schedule Detail (Protected)</div>} />
+                    <Route path="/schedule/edit/:id" element={<div>Schedule Edit (Protected)</div>} />
+                </Route>
 
-                    {/* 404 Catch-all Route - MUST BE THE LAST ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                </Routes>
-            </Layout>
-        </AuthProvider>
+                {/* 404 Catch-all Route - MUST BE THE LAST ROUTE */}
+                <Route path="*" element={<NotFound />} />
+            </Routes>
+        </Layout>
     );
 }
 

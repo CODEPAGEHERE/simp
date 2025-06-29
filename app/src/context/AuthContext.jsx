@@ -1,134 +1,126 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-// If you're decoding JWTs on the frontend for initial user data, uncomment this.
-// import jwt_decode from 'jwt-decode'; // Remember to `npm install jwt-decode` or `yarn add jwt-decode`
 
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const navigate = useNavigate();
+    const Navigate = useNavigate();
 
-    const [isAuthenticated, setIsAuthenticated] = useState(() => {
-        // Initialize isAuthenticated based on token presence in localStorage
+    const [IsAuthenticated, setIsAuthenticated] = useState(() => {
         return !!localStorage.getItem('jwtToken');
     });
 
-    const [userData, setUserData] = useState(null); // userData will store the fetched user details
+    const [UserData, setUserData] = useState(null);
 
-    // Helper function to fetch user data from the backend
-    const fetchUserData = async (token) => {
-        if (!token) {
+    const FetchUserData = async (Token) => {
+        if (!Token) {
             setUserData(null);
             return;
         }
         try {
-            const API_BASE_URL = import.meta.env.VITE_SIMP_API_POINT;
-            // This endpoint should return the current user's profile based on the JWT
-            const response = await fetch(`${API_BASE_URL}/auth/me`, {
+            const ApiBaseUrl = import.meta.env.VITE_SIMP_API_POINT;
+            const Response = await fetch(`${ApiBaseUrl}/auth/me`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`, // Send the token for authentication
+                    'Authorization': `Bearer ${Token}`,
                 },
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                console.log("DEBUG: User data fetched from /auth/me:", data);
-                setUserData(data); // Set the user data from the backend response
+            if (Response.ok) {
+                const Data = await Response.json();
+                console.log("DEBUG: User data fetched from /auth/me:", Data);
+                setUserData(Data);
             } else {
-                console.error('Failed to fetch user data:', response.status, await response.json());
-                // If fetching user data fails (e.g., token expired), invalidate authentication
+                console.error('Failed to fetch user data:', Response.status, await Response.json());
                 localStorage.removeItem('jwtToken');
                 setIsAuthenticated(false);
                 setUserData(null);
-                navigate('/login'); // Redirect to login
+                Navigate('/login');
             }
-        } catch (error) {
-            console.error('Network error while fetching user data:', error);
-            // This could be a temporary network issue, don't necessarily log out immediately
-            setUserData(null); // Clear user data
+        } catch (Error) {
+            console.error('Network error while fetching user data:', Error);
+            setUserData(null);
         }
     };
 
-    // The login function now ensures userData is populated
-    const login = (token, user = null) => {
-        localStorage.setItem('jwtToken', token);
+    const Login = (Token, Person = null) => {
+        localStorage.setItem('jwtToken', Token);
         setIsAuthenticated(true);
-        if (user) {
-            // If the login response directly provides user data (like your 'person' object)
-            setUserData(user);
+        if (Person) {
+            setUserData(Person);
         } else {
-            // Otherwise, fetch user data after setting the token
-            fetchUserData(token);
+            FetchUserData(Token);
         }
     };
 
-    // The logout function
-    const logout = () => {
+    const Logout = () => {
         localStorage.removeItem('jwtToken');
         setIsAuthenticated(false);
         setUserData(null);
-        navigate('/login');
+        Navigate('/login');
     };
 
-    // useEffect to re-hydrate authentication state and user data on component mount/refresh
     useEffect(() => {
-        const token = localStorage.getItem('jwtToken');
-        if (token) {
-            // If a token exists, consider user authenticated
-            setIsAuthenticated(true);
-            // And if userData isn't already set, fetch it (e.g., on hard refresh)
-            if (!userData) { // Prevents re-fetching if userData is already populated
-                fetchUserData(token);
+        const Token = localStorage.getItem('jwtToken');
+        if (Token) {
+            if (!IsAuthenticated) {
+                setIsAuthenticated(true);
+            }
+            if (!UserData) {
+                FetchUserData(Token);
+            }
+            if (IsAuthenticated && Navigate.location?.pathname === '/login') {
+                 Navigate('/dashboard');
+            } else if (IsAuthenticated && Navigate.location?.pathname === '/') {
+                 Navigate('/dashboard');
             }
         } else {
-            // If no token, ensure authentication state is false
             setIsAuthenticated(false);
             setUserData(null);
+            if (Navigate.location?.pathname !== '/login' && Navigate.location?.pathname !== '/register') {
+                Navigate('/login');
+            }
         }
 
-        // Listener for storage events (e.g., logout from another tab)
-        const handleStorageChange = (event) => {
-            if (event.key === 'jwtToken') {
-                const newToken = event.newValue;
-                setIsAuthenticated(!!newToken);
-                if (newToken) {
-                    fetchUserData(newToken); // Fetch user data if token reappears
+        const HandleStorageChange = (Event) => {
+            if (Event.key === 'jwtToken') {
+                const NewToken = Event.newValue;
+                setIsAuthenticated(!!NewToken);
+                if (NewToken) {
+                    FetchUserData(NewToken);
                 } else {
                     setUserData(null);
-                    navigate('/login'); // Redirect if token is cleared elsewhere
+                    Navigate('/login');
                 }
             }
         };
 
-        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('storage', HandleStorageChange);
 
         return () => {
-            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('storage', HandleStorageChange);
         };
-    }, [navigate, userData]); // Depend on navigate and userData to ensure effects run correctly
+    }, [IsAuthenticated, UserData, Navigate]);
 
-    // The value provided to any component that consumes this context
-    const contextValue = {
-        isAuthenticated,
-        userData, // This is what Dashboard and Nav will consume
-        login,
-        logout,
+    const ContextValue = {
+        IsAuthenticated,
+        UserData,
+        Login,
+        Logout,
     };
 
     return (
-        <AuthContext.Provider value={contextValue}>
+        <AuthContext.Provider value={ContextValue}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-// Custom hook for easier consumption in components
 export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
+    const Context = useContext(AuthContext);
+    if (!Context) {
         throw new Error('useAuth must be used within an AuthProvider');
     }
-    return context;
+    return Context;
 };

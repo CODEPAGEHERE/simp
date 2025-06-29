@@ -1,59 +1,57 @@
-// This file: backend/controllers/ScheduleController.js
-
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const Prisma = new PrismaClient();
 
-const durationToSeconds = (duration) => {
-    const hh = parseInt(duration.hh || 0);
-    const mm = parseInt(duration.mm || 0);
-    const ss = parseInt(duration.ss || 0);
+const durationToSeconds = (Duration) => {
+    const hh = parseInt(Duration.hh || 0);
+    const mm = parseInt(Duration.mm || 0);
+    const ss = parseInt(Duration.ss || 0);
     return (hh * 3600) + (mm * 60) + ss;
 };
 
 const ScheduleController = {
-    CreateSchedule: async (req, res) => { // PascalCase for exported function
+    CreateSchedule: async (req, res) => {
         try {
-            const userId = req.user.userId;
-            const { mainTask, subTasks } = req.body;
+            const UserId = req.user.userId;
+            const { mainTask: MainTask, subTasks: SubTasks } = req.body;
 
-            if (!mainTask || !mainTask.name || !mainTask.totalDuration || !userId) {
-                return res.status(400).json({ error: 'Missing required main task data or user ID.' });
+            if (!MainTask || !MainTask.name || !MainTask.totalDuration || !UserId) {
+                return res.status(400).json({ Error: 'Missing required main task data or user ID.' });
             }
 
-            if (!Array.isArray(subTasks) || subTasks.length === 0) {
-                return res.status(400).json({ error: 'At least one sub-task is required.' });
+            if (!Array.isArray(SubTasks) || SubTasks.length === 0) {
+                return res.status(400).json({ Error: 'At least one sub-task is required.' });
             }
 
-            for (const subTask of subTasks) {
-                const hasValidDurationComponent = !isNaN(parseInt(subTask.duration.hh)) ||
+            for (const subTask of SubTasks) {
+                const HasValidDurationComponent = !isNaN(parseInt(subTask.duration.hh)) ||
                                                  !isNaN(parseInt(subTask.duration.mm)) ||
                                                  !isNaN(parseInt(subTask.duration.ss));
 
-                if (!subTask.name || !hasValidDurationComponent) {
-                    return res.status(400).json({ error: 'Each sub-task must have a name and a valid duration (HH, MM, or SS).' });
+                if (!subTask.name || !HasValidDurationComponent) {
+                    return res.status(400).json({ Error: 'Each sub-task must have a name and a valid duration (HH, MM, or SS).' });
                 }
             }
 
-            const totalDurationSeconds = durationToSeconds(mainTask.totalDuration);
+            const TotalDurationSeconds = durationToSeconds(MainTask.totalDuration);
 
-            const subTasksToCreate = subTasks.map(subTask => ({
+            const SubTasksToCreate = SubTasks.map(subTask => ({
                 name: subTask.name,
                 durationSeconds: durationToSeconds(subTask.duration),
                 status: 'PENDING'
             }));
 
-            const newSchedule = await prisma.schedule.create({
+            const NewSchedule = await Prisma.schedule.create({
                 data: {
-                    title: mainTask.name,
-                    description: mainTask.description || null,
-                    totalDurationSeconds: totalDurationSeconds,
+                    title: MainTask.name,
+                    description: MainTask.description || null,
+                    totalDurationSeconds: TotalDurationSeconds,
                     status: 'PENDING',
                     person: {
-                        connect: { id: userId }
+                        connect: { id: UserId }
                     },
                     subTasks: {
                         createMany: {
-                            data: subTasksToCreate,
+                            data: SubTasksToCreate,
                         },
                     },
                 },
@@ -65,31 +63,31 @@ const ScheduleController = {
                 },
             });
 
-            res.status(201).json(newSchedule);
+            res.status(201).json(NewSchedule);
 
-        } catch (error) {
-            console.error('Error creating schedule:', error);
-            if (error.code === 'P2002') {
-                res.status(409).json({ error: 'A schedule with this title already exists.' });
-            } else if (error.code === 'P2025') {
-                res.status(404).json({ error: 'The specified user does not exist or invalid ID.' });
+        } catch (Error) {
+            console.error('Error creating schedule:', Error);
+            if (Error.code === 'P2002') {
+                res.status(409).json({ Error: 'A schedule with this title already exists.' });
+            } else if (Error.code === 'P2025') {
+                res.status(404).json({ Error: 'The specified user does not exist or invalid ID.' });
             } else {
-                res.status(500).json({ error: 'Failed to create schedule.', details: error.message });
+                res.status(500).json({ Error: 'Failed to create schedule.', Details: Error.message });
             }
         }
     },
 
-    GetSchedulesForUser: async (req, res) => { // PascalCase for exported function
+    GetSchedulesForUser: async (req, res) => {
         try {
-            const userId = req.user.userId;
+            const UserId = req.user.userId;
 
-            if (!userId) {
-                return res.status(401).json({ error: 'Unauthorized: User ID not found in token.' });
+            if (!UserId) {
+                return res.status(401).json({ Error: 'Unauthorized: User ID not found in token.' });
             }
 
-            const userSchedules = await prisma.schedule.findMany({
+            const UserSchedules = await Prisma.schedule.findMany({
                 where: {
-                    personId: userId,
+                    personId: UserId,
                 },
                 include: {
                     subTasks: true,
@@ -99,54 +97,54 @@ const ScheduleController = {
                 },
             });
 
-            res.status(200).json(userSchedules);
+            res.status(200).json(UserSchedules);
 
-        } catch (error) {
-            console.error('Error fetching ALL schedules for user:', error);
-            res.status(500).json({ error: 'Failed to retrieve schedules.', details: error.message });
+        } catch (Error) {
+            console.error('Error fetching ALL schedules for user:', Error);
+            res.status(500).json({ Error: 'Failed to retrieve schedules.', Details: Error.message });
         }
     },
 
-    DeleteSchedule: async (req, res) => { // PascalCase for exported function
+    DeleteSchedule: async (req, res) => {
         try {
-            const scheduleId = req.params.id;
-            const userId = req.user.userId;
+            const ScheduleId = req.params.id;
+            const UserId = req.user.userId;
 
-            if (!scheduleId) {
-                return res.status(400).json({ error: 'Schedule ID is required.' });
+            if (!ScheduleId) {
+                return res.status(400).json({ Error: 'Schedule ID is required.' });
             }
 
-            const scheduleToDelete = await prisma.schedule.findUnique({
-                where: { id: scheduleId },
+            const ScheduleToDelete = await Prisma.schedule.findUnique({
+                where: { id: ScheduleId },
             });
 
-            if (!scheduleToDelete) {
-                return res.status(404).json({ error: 'Schedule not found.' });
+            if (!ScheduleToDelete) {
+                return res.status(404).json({ Error: 'Schedule not found.' });
             }
 
-            if (scheduleToDelete.personId !== userId) {
-                return res.status(403).json({ error: 'Unauthorized to delete this schedule.' });
+            if (ScheduleToDelete.personId !== UserId) {
+                return res.status(403).json({ Error: 'Unauthorized to delete this schedule.' });
             }
 
-            await prisma.subTask.deleteMany({
-                where: { scheduleId: scheduleId },
+            await Prisma.subTask.deleteMany({
+                where: { scheduleId: ScheduleId },
             });
 
-            await prisma.schedule.delete({
-                where: { id: scheduleId },
+            await Prisma.schedule.delete({
+                where: { id: ScheduleId },
             });
 
-            res.status(200).json({ message: 'Schedule deleted successfully.' });
+            res.status(200).json({ Message: 'Schedule deleted successfully.' });
 
-        } catch (error) {
-            console.error('Error deleting schedule:', error);
-            if (error.code === 'P2025') {
-                res.status(404).json({ error: 'Schedule not found for deletion.' });
+        } catch (Error) {
+            console.error('Error deleting schedule:', Error);
+            if (Error.code === 'P2025') {
+                res.status(404).json({ Error: 'Schedule not found for deletion.' });
             } else {
-                res.status(500).json({ error: 'Failed to delete schedule.', details: error.message });
+                res.status(500).json({ Error: 'Failed to delete schedule.', Details: Error.message });
             }
         }
     },
 };
 
-module.exports = ScheduleController; // Export the PascalCase object
+module.exports = ScheduleController;

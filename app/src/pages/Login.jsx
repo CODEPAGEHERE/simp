@@ -3,122 +3,116 @@ import { Container, Row, Col, Form, Button, Alert, InputGroup } from 'react-boot
 import { Link, useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import '../App.css';
-import './login.css';
-import Loader from '../components/Loader'; // Ensure this path is correct
+import './Login.css';
+import Loader from '../components/Loader';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
-    const navigate = useNavigate();
-    const formContainerRef = useRef(null);
-    const { login: authContextLogin } = useAuth();
+    const Navigate = useNavigate();
+    const FormContainerRef = useRef(null);
+    const { login: AuthContextLogin } = useAuth();
 
-    const [identifier, setIdentifier] = useState('');
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [Identifier, setIdentifier] = useState('');
+    const [Password, setPassword] = useState('');
+    const [ShowPassword, setShowPassword] = useState(false);
+    const [IsLoading, setIsLoading] = useState(false);
 
-    const [message, setMessage] = useState('');
-    const [messageType, setMessageType] = useState('');
+    const [Message, setMessage] = useState('');
+    const [MessageType, setMessageType] = useState('');
 
-    const API_BASE_URL = import.meta.env.VITE_SIMP_API_POINT;
+    const ApiBaseUrl = import.meta.env.VITE_SIMP_API_POINT;
 
     useEffect(() => {
-        gsap.fromTo(formContainerRef.current,
+        gsap.fromTo(FormContainerRef.current,
             { opacity: 0, y: 50 },
             { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
         );
     }, []);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+    const HandleChange = (Event) => {
+        const { name, value } = Event.target;
         if (name === 'identifier') {
             setIdentifier(value);
         } else if (name === 'password') {
             setPassword(value);
         }
-        setMessage(''); // Clear message on input change
+        setMessage('');
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const HandleSubmit = async (Event) => {
+        Event.preventDefault();
         setMessage('');
         setMessageType('');
 
         setIsLoading(true);
 
-        if (!identifier.trim() || !password.trim()) {
+        if (!Identifier.trim() || !Password.trim()) {
             setMessage('Please enter both your username/phone number and password.');
             setMessageType('danger');
-            gsap.to(formContainerRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+            gsap.to(FormContainerRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
             setIsLoading(false);
             return;
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            const Response = await fetch(`${ApiBaseUrl}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ identifier, password }),
+                body: JSON.stringify({ Identifier: Identifier, Password: Password }),
             });
 
-            // Always attempt to parse the JSON response
-            const data = await response.json();
+            const Data = await Response.json();
 
-            if (response.ok) {
-                // --- Login Success ---
-                setMessage(data.message || 'Login successful!');
+            if (Response.ok) {
+                setMessage(Data.Message || 'Login successful!');
                 setMessageType('success');
-                if (data.token) {
-                    authContextLogin(data.token, data.person); // Update global auth state
+                if (Data.Token) {
+                    AuthContextLogin(Data.Token, Data.Person);
                 }
 
                 setTimeout(() => {
                     setIsLoading(false);
-                    navigate('/dashboard'); // Redirect to dashboard
+                    Navigate('/dashboard');
                 }, 1000);
 
             } else {
-                // --- Handle Errors ---
-                let errorMessage = 'An unexpected error occurred. Please try again.'; // Default generic message
+                let ErrorMessage = 'An unexpected error occurred. Please try again.';
 
-                // Check for rate limit error (status 429)
-                if (response.status === 429) {
-                    errorMessage = data.Message || 'Too many requests. Please try again later.'; // Use data.Message as defined in RateLimiter.js
-                } else if (response.status === 401) {
-                    // Unauthorized (e.g., invalid credentials)
-                    errorMessage = data.message || 'Invalid username or password.';
-                } else if (data.message) {
-                    // Fallback to message from API if available for other client errors
-                    errorMessage = data.message;
+                if (Response.status === 429) {
+                    ErrorMessage = Data.Message || 'Too many requests. Please try again later.';
+                } else if (Response.status === 401) {
+                    ErrorMessage = Data.Message || 'Invalid username or password.';
+                } else if (Data.Message) {
+                    ErrorMessage = Data.Message;
                 }
 
-                setMessage(errorMessage);
+                setMessage(ErrorMessage);
                 setMessageType('danger');
-                gsap.to(formContainerRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+                gsap.to(FormContainerRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
                 setIsLoading(false);
             }
-        } catch (error) {
-            console.error('Network or unexpected error during login:', error);
+        } catch (Error) {
+            console.error('Network or unexpected error during login:', Error);
             setMessage('Failed to connect to the server. Please check your connection or try again later.');
             setMessageType('danger');
-            gsap.to(formContainerRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+            gsap.to(FormContainerRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
             setIsLoading(false);
         }
     };
 
     return (
         <>
-            {isLoading && <Loader />}
+            {IsLoading && <Loader />}
 
             <div className="login-page-background">
                 <Row className="justify-content-center w-100">
                     <Col xs={12} sm={8} md={5} lg={4} className="mt-5">
-                        <Container ref={formContainerRef} className="text-center p-4 p-md-5 rounded shadow-sm bg-white form-container">
+                        <Container ref={FormContainerRef} className="text-center p-4 p-md-5 rounded shadow-sm bg-white form-container">
                             <h2 className="text-dark fw-bold mb-4">Login to Simp Account</h2>
 
-                            <Form onSubmit={handleSubmit}>
+                            <Form onSubmit={HandleSubmit}>
                                 <Form.Group className="mb-3 text-start" controlId="formIdentifier">
                                     <Form.Label className="text-dark">Username or Phone Number</Form.Label>
                                     <InputGroup>
@@ -126,8 +120,8 @@ const Login = () => {
                                         <Form.Control
                                             type="text"
                                             name="identifier"
-                                            value={identifier}
-                                            onChange={handleChange}
+                                            value={Identifier}
+                                            onChange={HandleChange}
                                             placeholder="Enter username or phone number"
                                             required
                                         />
@@ -137,20 +131,19 @@ const Login = () => {
                                 <Form.Group className="mb-4 text-start" controlId="formPassword">
                                     <Form.Label className="text-dark">Password</Form.Label>
                                     <InputGroup>
-                                        <InputGroup.Text><i className="bi bi-lock"></i></InputGroup.Text>
                                         <Form.Control
-                                            type={showPassword ? "text" : "password"}
+                                            type={ShowPassword ? "text" : "password"}
                                             name="password"
-                                            value={password}
-                                            onChange={handleChange}
+                                            value={Password}
+                                            onChange={HandleChange}
                                             placeholder="Enter your password"
                                             required
                                         />
                                         <Button
                                             variant="outline-secondary"
-                                            onClick={() => setShowPassword(!showPassword)}
+                                            onClick={() => setShowPassword(!ShowPassword)}
                                         >
-                                            <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                                            <i className={`bi ${ShowPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
                                         </Button>
                                     </InputGroup>
                                     <div className="text-end mt-1">
@@ -160,9 +153,9 @@ const Login = () => {
                                     </div>
                                 </Form.Group>
 
-                                {message && (
-                                    <Alert variant={messageType} className="mt-3">
-                                        {message}
+                                {Message && (
+                                    <Alert variant={MessageType} className="mt-3">
+                                        {Message}
                                     </Alert>
                                 )}
 
@@ -170,9 +163,9 @@ const Login = () => {
                                     variant="secondary"
                                     type="submit"
                                     className="w-100"
-                                    disabled={isLoading}
+                                    disabled={IsLoading}
                                 >
-                                    {isLoading ? 'Logging In...' : 'Login'}
+                                    {IsLoading ? 'Logging In...' : 'Login'}
                                 </Button>
                             </Form>
 

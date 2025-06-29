@@ -1,16 +1,14 @@
-// File: backend/routes/scheduleRoutes.js
-
 const Express = require('express');
 const Router = Express.Router();
 
 const ScheduleController = require('../controllers/ScheduleController');
 
-const AuthMiddleware = require('../middleware/AuthMiddleware'); // Changed to PascalCase
+const { Protect } = require('../middleware/AuthMiddleware'); 
 
-Router.post('/', AuthMiddleware, ScheduleController.CreateSchedule);
+Router.post('/', Protect, ScheduleController.CreateSchedule); 
 
-Router.get('/schedules/user', AuthMiddleware, ScheduleController.GetSchedulesForUser);
+Router.get('/schedules/user', Protect, ScheduleController.GetSchedulesForUser); 
 
-Router.delete('/schedules/:id', AuthMiddleware, ScheduleController.DeleteSchedule);
+Router.delete('/schedules/:id', Protect, ScheduleController.DeleteSchedule); 
 
 module.exports = Router;

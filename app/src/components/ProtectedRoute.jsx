@@ -1,13 +1,17 @@
+// src/components/ProtectedRoute.jsx
+
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Import your useAuth hook
+// Import your useAuth hook - assuming the file is context/AuthContext.jsx
+import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = () => {
-  // Use the useAuth hook to get the isAuthenticated state from your context
-  const { isAuthenticated } = useAuth();
+  // Use the useAuth hook to get the IsAuthenticated state from your context
+  // IMPORTANT: Use IsAuthenticated (PascalCase) as defined in AuthContext.jsx
+  const { IsAuthenticated } = useAuth();
 
   // If not authenticated (based on the reactive context state), redirect
-  if (!isAuthenticated) {
+  if (!IsAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 

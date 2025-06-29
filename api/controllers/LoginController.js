@@ -1,82 +1,84 @@
+// File: backend/controllers/LoginController.js
+
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken'); // <--- NEW: Import jsonwebtoken
+const Bcrypt = require('bcryptjs');
+const Jwt = require('jsonwebtoken');
 
-const prisma = new PrismaClient();
+const Prisma = new PrismaClient();
 
-const login = async (req, res) => {
-    const { identifier, password } = req.body;
+const LoginController = {
+    Login: async (req, res) => {
+        const { Identifier, Password } = req.body;
 
-    if (!identifier || !password) {
-        return res.status(400).json({ message: 'Username/Phone number and password are required.' });
-    }
-
-    try {
-        let person = null;
-
-        const cleanIdentifier = identifier.toLowerCase().trim();
-        person = await prisma.person.findUnique({
-            where: { username: cleanIdentifier },
-        });
-
-        if (!person) {
-            let processedPhoneNo = identifier;
-            processedPhoneNo = processedPhoneNo.replace(/[^+\d]/g, '');
-
-            if (processedPhoneNo.startsWith('0')) {
-                processedPhoneNo = '+234' + processedPhoneNo.substring(1);
-            } else if (!processedPhoneNo.startsWith('+234')) {
-                processedPhoneNo = '+234' + processedPhoneNo;
-            }
-
-            if (/^\+234[789]\d{9}$/.test(processedPhoneNo)) {
-                person = await prisma.person.findUnique({
-                    where: { phoneNo: processedPhoneNo },
-                });
-            }
+        if (!Identifier || !Password) {
+            return res.status(400).json({ Message: 'Username/Phone number and password are required.' });
         }
 
-        if (!person) {
-            return res.status(401).json({ message: 'Invalid username or password.' });
-        }
+        try {
+            let Person = null;
 
-        const isPasswordValid = await bcrypt.compare(password, person.passwordHash);
+            const CleanIdentifier = Identifier.toLowerCase().trim();
+            Person = await Prisma.person.findUnique({
+                where: { username: CleanIdentifier },
+            });
 
-        if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Invalid username or password.' });
-        }
+            if (!Person) {
+                let ProcessedPhoneNo = Identifier;
 
-        // --- NEW: Generate JWT Token ---
-        // Payload for the token (don't include sensitive info like passwordHash)
-        const tokenPayload = {
-            userId: person.id,
-            username: person.username,
-            // You might add roles or other non-sensitive user info here
-        };
+                ProcessedPhoneNo = ProcessedPhoneNo.replace(/[^+\d]/g, '');
 
-        // Sign the token
-        const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
-            expiresIn: '1h', // Token expires in 1 hour
-        });
-        // --- END NEW ---
+                if (ProcessedPhoneNo.startsWith('0')) {
+                    ProcessedPhoneNo = '+234' + ProcessedPhoneNo.substring(1);
+                } else if (!ProcessedPhoneNo.startsWith('+234')) {
+                    ProcessedPhoneNo = '+234' + ProcessedPhoneNo;
+                }
 
-        res.status(200).json({
-            message: 'Login successful!',
-            token: token, // <--- NEW: Send the token back to the client
-            person: { // Also send some safe user data if needed (optional, token usually enough)
-                id: person.id,
-                name: person.name,
-                username: person.username,
-                phoneNo: person.phoneNo,
+                if (/^\+234[789]\d{9}$/.test(ProcessedPhoneNo)) {
+                    Person = await Prisma.person.findUnique({
+                        where: { phoneNo: ProcessedPhoneNo },
+                    });
+                }
             }
-        });
 
-    } catch (error) {
-        console.error('Error during person login:', error);
-        res.status(500).json({ message: 'An unexpected error occurred during login.' });
-    }
+            if (!Person) {
+                return res.status(401).json({ Message: 'Invalid username or password.' });
+            }
+
+            const IsPasswordValid = await Bcrypt.compare(Password, Person.passwordHash);
+
+            if (!IsPasswordValid) {
+                return res.status(401).json({ Message: 'Invalid username or password.' });
+            }
+
+            const TokenPayload = {
+                UserId: Person.id,
+                Username: Person.username,
+            };
+
+            const Token = Jwt.sign(TokenPayload, process.env.JWT_SECRET, {
+                expiresIn: '1h',
+            });
+
+            const PersonResponse = {
+                Id: Person.id,
+                Name: Person.name,
+                Username: Person.username,
+                PhoneNo: Person.phoneNo,
+                Email: Person.email,
+                CreatedAt: Person.createdAt,
+            };
+
+            res.status(200).json({
+                Message: 'Login successful!',
+                Token: Token,
+                Person: PersonResponse,
+            });
+
+        } catch (Error) {
+            console.error('Error during person login:', Error);
+            res.status(500).json({ Message: 'An unexpected error occurred during login.', Details: Error.message });
+        }
+    },
 };
 
-module.exports = {
-    login,
-};
+module.exports = LoginController;

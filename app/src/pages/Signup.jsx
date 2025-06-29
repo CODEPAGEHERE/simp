@@ -4,179 +4,162 @@ import { gsap } from 'gsap';
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
 import './SignUp.css';
-import Loader from '../components/Loader'; // Adjusted import path for Loader component
+import Loader from '../components/Loader';
 
 const Signup = () => {
-    const [name, setName] = useState('');
-    const [phoneNo, setPhoneNo] = useState('+234');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
+    const [Name, setName] = useState('');
+    const [PhoneNo, setPhoneNo] = useState('+234');
+    const [Username, setUsername] = useState('');
+    const [Password, setPassword] = useState('');
+    const [ShowPassword, setShowPassword] = useState(false);
 
-    const [message, setMessage] = useState('');
-    const [messageType, setMessageType] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    // New state for inline password validation messages
-    const [passwordValidationMessage, setPasswordValidationMessage] = useState('');
+    const [Message, setMessage] = useState('');
+    const [MessageType, setMessageType] = useState('');
+    const [IsLoading, setIsLoading] = useState(false);
+    const [PasswordValidationMessage, setPasswordValidationMessage] = useState('');
 
-    const pageContentRef = useRef();
-    const navigate = useNavigate();
+    const PageContentRef = useRef();
+    const Navigate = useNavigate();
 
     useEffect(() => {
-        gsap.fromTo(pageContentRef.current,
+        gsap.fromTo(PageContentRef.current,
             { opacity: 0, y: -50 },
             { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }
         );
     }, []);
 
-    const SIMP_API_POINT = import.meta.env.VITE_SIMP_API_POINT;
+    const SimpApiPoint = import.meta.env.VITE_SIMP_API_POINT;
 
-    // Handler for all input changes except password (which has its own)
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+    const HandleChange = (Event) => {
+        const { name, value } = Event.target;
         if (name === 'name') setName(value);
         else if (name === 'phoneNo') setPhoneNo(value);
         else if (name === 'username') setUsername(value);
 
-        // Clear general messages when other inputs change
         setMessage('');
         setMessageType('');
     };
 
-    // Dedicated handler for password input changes with real-time validation feedback
-    const handlePasswordChange = (e) => {
-        const newPassword = e.target.value;
-        setPassword(newPassword);
+    const HandlePasswordChange = (Event) => {
+        const NewPassword = Event.target.value;
+        setPassword(NewPassword);
 
-        // Clear general messages and previous password specific messages on typing
         setMessage('');
         setMessageType('');
 
-        // Client-side password validation logic (mimics backend validation)
-        // This regex allows letters, numbers, and common special characters. No spaces.
-        const allowedPasswordCharsRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]+$/;
+        const AllowedPasswordCharsRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]+$/;
 
-        if (newPassword.length > 0) {
-            if (newPassword.length < 10) { // Enforce minimum 10 characters
+        if (NewPassword.length > 0) {
+            if (NewPassword.length < 10) {
                 setPasswordValidationMessage('Password must be at least 10 characters long.');
-            } else if (!allowedPasswordCharsRegex.test(newPassword)) {
+            } else if (!AllowedPasswordCharsRegex.test(NewPassword)) {
                 setPasswordValidationMessage('Password can only contain letters, numbers, and common special characters (e.g., !@#$%^&*). No spaces allowed.');
             } else {
-                setPasswordValidationMessage(''); // Password is valid according to client-side rules
+                setPasswordValidationMessage('');
             }
         } else {
-            setPasswordValidationMessage(''); // Clear message if password field is empty
+            setPasswordValidationMessage('');
         }
     };
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
+    const HandleSubmit = async (Event) => {
+        Event.preventDefault();
 
-        // Clear any previous messages before attempting submission
         setMessage('');
         setMessageType('');
-        setPasswordValidationMessage(''); // Also clear password specific message
+        setPasswordValidationMessage('');
 
         setIsLoading(true);
 
-        // --- Frontend Form Validation before sending to backend ---
-        if (!name || !phoneNo || !username || !password) {
+        if (!Name || !PhoneNo || !Username || !Password) {
             setMessage('Please fill in all fields.');
             setMessageType('danger');
-            gsap.to(pageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+            gsap.to(PageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
             setIsLoading(false);
             return;
         }
 
-        // Re-run password validation specifically for submission, showing general alert if invalid
-        const allowedPasswordCharsRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]+$/;
-        if (password.length < 10) {
+        const AllowedPasswordCharsRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]+$/;
+        if (Password.length < 10) {
             setMessage('Password must be at least 9 characters long.');
             setMessageType('danger');
-            gsap.to(pageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+            gsap.to(PageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
             setIsLoading(false);
             return;
         }
-        if (!allowedPasswordCharsRegex.test(password)) {
+        if (!AllowedPasswordCharsRegex.test(Password)) {
             setMessage('Password can only contain letters, numbers, and common special characters (e.g., !@#$%^&*). No spaces allowed.');
             setMessageType('danger');
-            gsap.to(pageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+            gsap.to(PageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
             setIsLoading(false);
             return;
         }
-        // Prevent username and password from being identical (backend also checks this)
-        if (username.toLowerCase().trim() === password.trim()) {
+        if (Username.toLowerCase().trim() === Password.trim()) {
             setMessage('Username and password cannot be the same.');
             setMessageType('danger');
-            gsap.to(pageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+            gsap.to(PageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
             setIsLoading(false);
             return;
         }
-        // --- End Frontend Form Validation ---
 
         try {
-            const response = await fetch(`${SIMP_API_POINT}/auth/signup`, {
+            const Response = await fetch(`${SimpApiPoint}/auth/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ name, phoneNo, username, password })
+                body: JSON.stringify({ Name: Name, PhoneNo: PhoneNo, Username: Username, Password: Password }) // FIX: Changed keys to PascalCase
             });
 
-            const data = await response.json();
+            const Data = await Response.json(); // Changed 'data' to 'Data'
 
-            if (response.ok) {
-                setMessage(data.message || 'Signup successful! Redirecting to login...');
+            if (Response.ok) {
+                setMessage(Data.Message || 'Signup successful! Redirecting to login...'); // FIX: Changed 'data.message' to 'Data.Message'
                 setMessageType('success');
-                // Clear form fields on successful signup
                 setName('');
                 setPhoneNo('+234');
                 setUsername('');
                 setPassword('');
-                setPasswordValidationMessage(''); // Ensure password validation message is cleared
+                setPasswordValidationMessage('');
 
                 setTimeout(() => {
                     setIsLoading(false);
-                    navigate('/login'); // Redirect to login page after success
-                }, 2000); // 2-second delay for user to read success message
+                    Navigate('/login');
+                }, 2000);
 
             } else {
-                // Display error message from backend
-                setMessage(data.message || 'An error occurred during signup.');
+                setMessage(Data.Message || 'An error occurred during signup.'); // FIX: Changed 'data.message' to 'Data.Message'
                 setMessageType('danger');
-                gsap.to(pageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" }); // Shake effect for error
+                gsap.to(PageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
                 setIsLoading(false);
             }
-        } catch (error) {
-            console.error('Network or unexpected error:', error);
+        } catch (Error) { // Changed 'error' to 'Error'
+            console.error('Network or unexpected error:', Error);
             setMessage('Failed to connect to the server. Please check your internet connection or try again later.');
             setMessageType('danger');
-            gsap.to(pageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" }); // Shake effect for error
+            gsap.to(PageContentRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
             setIsLoading(false);
         }
     };
 
     return (
         <div className="signup-page-wrapper">
-            {/* Conditionally render the Loader component */}
-            {isLoading && <Loader />}
+            {IsLoading && <Loader />}
 
             <div className="signup-content-offset">
-                <Container className="py-5" ref={pageContentRef}>
+                <Container className="py-5" ref={PageContentRef}>
                     <Row className="justify-content-md-center">
                         <Col md={9} lg={8}>
                             <div className="p-4 border rounded shadow-sm bg-white">
                                 <h2 className="text-center mb-4">Create Simp Account</h2>
 
-                                {/* Alert for general messages (success/danger) */}
-                                {message && (
-                                    <Alert variant={messageType} className="mb-3 text-center">
-                                        {message}
+                                {Message && (
+                                    <Alert variant={MessageType} className="mb-3 text-center">
+                                        {Message}
                                     </Alert>
                                 )}
 
-                                <Form onSubmit={handleSubmit}>
-                                    {/* Full Name & Phone Number */}
+                                <Form onSubmit={HandleSubmit}>
                                     <Row>
                                         <Col md={6}>
                                             <Form.Group className="mb-3" controlId="formName">
@@ -185,10 +168,10 @@ const Signup = () => {
                                                 </Form.Label>
                                                 <Form.Control
                                                     type="text"
-                                                    name="name" // Added name prop
+                                                    name="name"
                                                     placeholder="Enter your full name"
-                                                    value={name}
-                                                    onChange={handleChange}
+                                                    value={Name}
+                                                    onChange={HandleChange}
                                                     required
                                                 />
                                                 <Form.Text className="text-muted"></Form.Text>
@@ -201,10 +184,10 @@ const Signup = () => {
                                                 </Form.Label>
                                                 <Form.Control
                                                     type="tel"
-                                                    name="phoneNo" // Added name prop
+                                                    name="phoneNo"
                                                     placeholder="e.g., +2348123456789 or 08123456789"
-                                                    value={phoneNo}
-                                                    onChange={handleChange}
+                                                    value={PhoneNo}
+                                                    onChange={HandleChange}
                                                     required
                                                 />
                                                 <Form.Text className="text-muted"></Form.Text>
@@ -212,7 +195,6 @@ const Signup = () => {
                                         </Col>
                                     </Row>
 
-                                    {/* Username & Password */}
                                     <Row>
                                         <Col md={6}>
                                             <Form.Group className="mb-3" controlId="formUsername">
@@ -221,10 +203,10 @@ const Signup = () => {
                                                 </Form.Label>
                                                 <Form.Control
                                                     type="text"
-                                                    name="username" // Added name prop
+                                                    name="username"
                                                     placeholder="Enter a unique username"
-                                                    value={username}
-                                                    onChange={handleChange}
+                                                    value={Username}
+                                                    onChange={HandleChange}
                                                     required
                                                 />
                                                 <Form.Text className="text-muted"></Form.Text>
@@ -237,28 +219,26 @@ const Signup = () => {
                                                 </Form.Label>
                                                 <InputGroup>
                                                     <Form.Control
-                                                        type={showPassword ? "text" : "password"}
-                                                        name="password" // Added name prop
+                                                        type={ShowPassword ? "text" : "password"}
+                                                        name="password"
                                                         placeholder="Enter your password"
-                                                        value={password}
-                                                        onChange={handlePasswordChange} // Use new dedicated handler
+                                                        value={Password}
+                                                        onChange={HandlePasswordChange}
                                                         required
                                                     />
                                                     <Button
                                                         variant="outline-secondary"
-                                                        onClick={() => setShowPassword(!showPassword)}
+                                                        onClick={() => setShowPassword(!ShowPassword)}
                                                     >
-                                                        <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                                                        <i className={`bi ${ShowPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
                                                     </Button>
                                                 </InputGroup>
-                                                {/* Display inline password validation message */}
-                                                {passwordValidationMessage && (
+                                                {PasswordValidationMessage && (
                                                     <Form.Text className="text-danger">
-                                                        {passwordValidationMessage}
+                                                        {PasswordValidationMessage}
                                                     </Form.Text>
                                                 )}
-                                                {/* Display general password hint if no validation error */}
-                                                {!passwordValidationMessage && (
+                                                {!PasswordValidationMessage && (
                                                     <Form.Text className="text-muted">
                                                         
                                                     </Form.Text>
@@ -267,9 +247,9 @@ const Signup = () => {
                                         </Col>
                                     </Row>
 
-                                    <Button variant="secondary" type="submit" className="w-100 mt-3" disabled={isLoading}>
+                                    <Button variant="secondary" type="submit" className="w-100 mt-3" disabled={IsLoading}>
                                         <i className="bi bi-check-circle-fill me-2"></i>
-                                        {isLoading ? 'Signing Up...' : 'Sign Up'}
+                                        {IsLoading ? 'Signing Up...' : 'Sign Up'}
                                     </Button>
                                 </Form>
                             </div>

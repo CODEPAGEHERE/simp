@@ -1,38 +1,46 @@
-// File: backend/controllers/GetMeController.js
-
 const { PrismaClient } = require('@prisma/client');
 const Prisma = new PrismaClient();
 
 const GetMeController = {
-    GetMe: async (Req, Res) => {
+    GetMe: async (req, res) => {
         try {
-            const UserId = Req.User.UserId;
+            const UserId = req.User.UserId;
 
             if (!UserId) {
-                return Res.status(401).json({ Error: 'Unauthorized: User ID not found in token payload.' });
+                return res.status(401).json({ Error: 'Unauthorized: User ID not found in token payload.' });
             }
 
             const User = await Prisma.person.findUnique({
-                where: { Id: UserId },
+                where: { id: UserId },
                 select: {
-                    Id: true,
-                    Username: true,
-                    Email: true,
-                    Name: true,
-                    PhoneNo: true,
-                    CreatedAt: true,
+                    id: true,
+                    username: true,
+                    email: true,
+                    name: true,
+                    phoneNo: true,
+                    createdAt: true,
                 },
             });
 
             if (!User) {
-                return Res.status(404).json({ Error: 'User not found for the provided token.' });
+                return res.status(404).json({ Error: 'User not found for the provided token.' });
             }
 
-            Res.status(200).json(User);
+            // Map Prisma's camelCase output to PascalCase for the response JSON
+            const UserResponse = {
+                Id: User.id,
+                Username: User.username,
+                Email: User.email,
+                Name: User.name,
+                PhoneNo: User.phoneNo,
+                CreatedAt: User.createdAt,
+            };
+
+            res.status(200).json(UserResponse);
 
         } catch (Error) {
             console.error('Error fetching user data in GetMeController:', Error);
-            Res.status(500).json({ Error: 'Failed to retrieve user data.', Details: Error.Message });
+            res.status(500).json({ Error: 'Failed to retrieve user data.', Details: Error.Message });
         }
     },
 };

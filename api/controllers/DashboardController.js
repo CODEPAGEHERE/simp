@@ -1,15 +1,13 @@
-// File: backend/controllers/DashboardController.js
-
 const { PrismaClient } = require('@prisma/client');
 const Prisma = new PrismaClient();
 
 const DashboardController = {
-    GetDashboardSchedules: async (Req, Res) => {
+    GetDashboardSchedules: async (req, res) => {
         try {
-            const UserId = Req.User.UserId;
+            const UserId = req.User.UserId;
 
             if (!UserId) {
-                return Res.status(401).json({ Error: 'Unauthorized: User ID not found in token.' });
+                return res.status(401).json({ Error: 'Unauthorized: User ID not found in token.' });
             }
 
             const Now = new Date();
@@ -26,40 +24,40 @@ const DashboardController = {
 
             const Next7DaysSchedules = await Prisma.schedule.findMany({
                 where: {
-                    PersonId: UserId,
-                    StartDate: {
+                    personId: UserId,
+                    startDate: {
                         gte: StartOfToday,
                         lte: EndOfNextSevenDays,
                     },
                 },
                 orderBy: {
-                    StartDate: 'asc',
+                    startDate: 'asc',
                 },
-                include: { SubTasks: true },
+                include: { subTasks: true },
             });
 
             const Past3DaysSchedules = await Prisma.schedule.findMany({
                 where: {
-                    PersonId: UserId,
-                    CreatedAt: {
+                    personId: UserId,
+                    createdAt: {
                         gte: StartOfThreeDaysAgo,
                         lt: StartOfToday,
                     },
                 },
                 orderBy: {
-                    CreatedAt: 'desc',
+                    createdAt: 'desc',
                 },
-                include: { SubTasks: true },
+                include: { subTasks: true },
             });
 
-            Res.status(200).json({
+            res.status(200).json({
                 Next7Days: Next7DaysSchedules,
                 Past3Days: Past3DaysSchedules,
             });
 
         } catch (Error) {
             console.error('Error fetching dashboard schedules:', Error);
-            Res.status(500).json({ Error: 'Failed to retrieve dashboard schedules.', Details: Error.Message });
+            res.status(500).json({ Error: 'Failed to retrieve dashboard schedules.', Details: Error.Message });
         }
     },
 };

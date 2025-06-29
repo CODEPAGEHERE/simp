@@ -1,17 +1,23 @@
+// src/components/Layout.jsx
+
 import React from 'react';
+// Assuming the file is components/Nav.jsx and exports a component named Nav
 import Nav from './Nav';
 import './Layout.css';
+// Assuming the file is components/Footer.jsx and exports a component named Footer
 import Footer from './Footer';
-import { useAuth } from '../context/AuthContext'; // Import your useAuth hook
+// Import your useAuth hook - assuming the file is context/AuthContext.jsx
+import { useAuth } from '../context/AuthContext';
 
-const Layout = ({ children }) => { // Removed isAuthenticated, onLogout from props
-    // Get isAuthenticated state and the logout function directly from AuthContext
-    const { isAuthenticated, logout } = useAuth();
+const Layout = ({ children }) => {
+    // Get IsAuthenticated state and the Logout function directly from AuthContext
+    // IMPORTANT: Use IsAuthenticated (PascalCase) and Logout (PascalCase) as defined in AuthContext.jsx
+    const { IsAuthenticated, Logout } = useAuth();
 
     return (
         <div className="app-container">
-            {/* Pass isAuthenticated and the logout function (from context) to the Nav component */}
-            <Nav isAuthenticated={isAuthenticated} onLogout={logout} />
+            {/* Pass IsAuthenticated and the Logout function (from context) to the Nav component */}
+            <Nav IsAuthenticated={IsAuthenticated} OnLogout={Logout} />
 
             <main className="main-content">
                 {children}
