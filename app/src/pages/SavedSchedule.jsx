@@ -1,8 +1,9 @@
+// File: frontend/src/pages/SaveSchedulePage.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import Nav from '../components/nav'; // REMOVED: Nav component
 import ScheduleListItem from '../components/ScheduleListItem';
-import Loader from '../components/Loader'; // ADDED: Your custom Loader component
+import Loader from '../components/Loader';
 import './SaveSchedule.css';
 
 const SaveSchedulePage = () => {
@@ -12,7 +13,6 @@ const SaveSchedulePage = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // Ensure your VITE_SIMP_API_POINT is correctly set in your .env file
     const API_BASE_URL = import.meta.env.VITE_SIMP_API_POINT;
 
     useEffect(() => {
@@ -52,6 +52,7 @@ const SaveSchedulePage = () => {
 
                 const recent = data
                     .filter(schedule => {
+                        // Assuming 'lastUsedAt' is the correct field for recency and exists
                         if (!schedule.lastUsedAt) return false;
                         const scheduleDate = new Date(schedule.lastUsedAt);
                         return scheduleDate > oneWeekAgo;
@@ -81,6 +82,7 @@ const SaveSchedulePage = () => {
     };
 
     const handleDeleteSchedule = async (id) => {
+        // TODO: Replace window.confirm with a custom modal for better UX
         if (!window.confirm("Are you sure you want to delete this schedule? This action cannot be undone.")) {
             return;
         }
@@ -105,10 +107,12 @@ const SaveSchedulePage = () => {
                 throw new Error(errorData.message || `Failed to delete schedule: ${response.statusText}`);
             }
 
-            setSchedules(prevSchedules => prevSchedules.filter(s => s._id !== id));
-            setRecentSchedules(prevRecent => prevRecent.filter(s => s._id !== id));
+            // Update state by filtering out the deleted schedule. Assuming 'id' is the unique identifier
+            setSchedules(prevSchedules => prevSchedules.filter(s => s.id !== id));
+            setRecentSchedules(prevRecent => prevRecent.filter(s => s.id !== id));
 
-            alert('Schedule deleted successfully!');
+            // TODO: Replace with custom modal for success message
+            // alert('Schedule deleted successfully!');
 
         } catch (err) {
             console.error("Error deleting schedule:", err);
@@ -118,10 +122,7 @@ const SaveSchedulePage = () => {
 
     // Render Logic for Loading/Error states
     if (loading) {
-        return (
-            // Replaced the text message with your Loader component
-            <Loader />
-        );
+        return <Loader />;
     }
 
     if (error) {
@@ -136,19 +137,17 @@ const SaveSchedulePage = () => {
     // Main Page Content
     return (
         <>
-            {/* REMOVED: <Nav /> */}
-
             <div className="save-schedule-page-wrapper">
                 <div className="save-schedule-page-content">
-               
+
                     {/* --- Recent Schedules Section --- */}
                     <div className="recent-schedules-section">
-                        <h2 className="section-title">Recently </h2>
+                        <h2 className="section-title">Recently Used Schedules</h2>
                         {recentSchedules.length > 0 ? (
                             <div className="recent-schedules-list-container">
                                 {recentSchedules.map(schedule => (
                                     <ScheduleListItem
-                                        key={schedule._id}
+                                        key={schedule.id}
                                         schedule={schedule}
                                         onView={handleViewDetails}
                                         onEdit={handleEditSchedule}
@@ -167,10 +166,10 @@ const SaveSchedulePage = () => {
                     <div className="all-schedules-section">
                         <h2 className="section-title">All Your Schedules</h2>
                         {schedules.length > 0 ? (
-                            <div className="all-schedules-list-container"> {/* This is the scrollable container */}
+                            <div className="all-schedules-list-container">
                                 {schedules.map(schedule => (
                                     <ScheduleListItem
-                                        key={schedule._id}
+                                        key={schedule.id}
                                         schedule={schedule}
                                         onView={handleViewDetails}
                                         onEdit={handleEditSchedule}

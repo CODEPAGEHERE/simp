@@ -6,22 +6,22 @@ const Prisma = new PrismaClient();
 
 const LoginController = {
     Login: async (req, res) => {
-        const { Identifier, Password } = req.body;
+        const { identifier, password } = req.body;
 
-        if (!Identifier || !Password) {
+        if (!identifier || !password) {
             return res.status(400).json({ Message: 'Username/Phone number and password are required.' });
         }
 
         try {
             let Person = null;
 
-            const CleanIdentifier = Identifier.toLowerCase().trim();
+            const CleanIdentifier = identifier.toLowerCase().trim();
             Person = await Prisma.person.findUnique({
                 where: { username: CleanIdentifier },
             });
 
             if (!Person) {
-                let ProcessedPhoneNo = Identifier;
+                let ProcessedPhoneNo = identifier;
 
                 ProcessedPhoneNo = ProcessedPhoneNo.replace(/[^+\d]/g, '');
 
@@ -42,7 +42,7 @@ const LoginController = {
                 return res.status(401).json({ Message: 'Invalid username or password.' });
             }
 
-            const IsPasswordValid = await Bcrypt.compare(Password, Person.passwordHash);
+            const IsPasswordValid = await Bcrypt.compare(password, Person.passwordHash);
 
             if (!IsPasswordValid) {
                 return res.status(401).json({ Message: 'Invalid username or password.' });

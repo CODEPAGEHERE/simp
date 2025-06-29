@@ -5,12 +5,12 @@ const Prisma = new PrismaClient();
 
 const SignupController = {
     Signup: async (req, res) => {
-        const { Name, PhoneNo, Username, Password } = req.body;
+        const { name, phoneNo, username, password } = req.body;
 
-        const ProcessedName = Name ? Name.trim() : '';
-        let ProcessedPhoneNo = PhoneNo;
-        const CleanUsername = Username ? Username.toLowerCase().trim() : '';
-        const CleanPassword = Password ? Password.trim() : '';
+        const ProcessedName = name ? name.trim() : '';
+        let ProcessedPhoneNo = phoneNo;
+        const CleanUsername = username ? username.toLowerCase().trim() : '';
+        const CleanPassword = password ? password.trim() : '';
 
         if (!ProcessedName || !ProcessedPhoneNo || !CleanUsername || !CleanPassword) {
             return res.status(400).json({ Message: 'All fields (name, phone number, username, password) are required.' });
@@ -43,7 +43,7 @@ const SignupController = {
             return res.status(400).json({ Message: 'Username can only contain lowercase letters and numbers, no special characters or spaces.' });
         }
 
-        const AllowedPasswordCharsRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]+$/;
+        const AllowedPasswordCharsRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~~`]+$/;
 
         if (CleanPassword.length < 9) {
             return res.status(400).json({ Message: 'Password must be at least 10 characters long.' });

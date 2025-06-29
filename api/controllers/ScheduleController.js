@@ -11,7 +11,7 @@ const durationToSeconds = (Duration) => {
 const ScheduleController = {
     CreateSchedule: async (req, res) => {
         try {
-            const UserId = req.user.userId;
+            const UserId = req.User.UserId;
             const { mainTask: MainTask, subTasks: SubTasks } = req.body;
 
             if (!MainTask || !MainTask.name || !MainTask.totalDuration || !UserId) {
@@ -24,8 +24,8 @@ const ScheduleController = {
 
             for (const subTask of SubTasks) {
                 const HasValidDurationComponent = !isNaN(parseInt(subTask.duration.hh)) ||
-                                                 !isNaN(parseInt(subTask.duration.mm)) ||
-                                                 !isNaN(parseInt(subTask.duration.ss));
+                                                   !isNaN(parseInt(subTask.duration.mm)) ||
+                                                   !isNaN(parseInt(subTask.duration.ss));
 
                 if (!subTask.name || !HasValidDurationComponent) {
                     return res.status(400).json({ Error: 'Each sub-task must have a name and a valid duration (HH, MM, or SS).' });
@@ -79,7 +79,7 @@ const ScheduleController = {
 
     GetSchedulesForUser: async (req, res) => {
         try {
-            const UserId = req.user.userId;
+            const UserId = req.User.UserId;
 
             if (!UserId) {
                 return res.status(401).json({ Error: 'Unauthorized: User ID not found in token.' });
@@ -108,7 +108,7 @@ const ScheduleController = {
     DeleteSchedule: async (req, res) => {
         try {
             const ScheduleId = req.params.id;
-            const UserId = req.user.userId;
+            const UserId = req.User.UserId;
 
             if (!ScheduleId) {
                 return res.status(400).json({ Error: 'Schedule ID is required.' });

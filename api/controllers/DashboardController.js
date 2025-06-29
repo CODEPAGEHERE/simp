@@ -1,5 +1,3 @@
-// File: backend/controllers/DashboardController.js
-
 const { PrismaClient } = require('@prisma/client');
 const Prisma = new PrismaClient();
 
@@ -59,7 +57,7 @@ const DashboardController = {
 
         } catch (Error) {
             console.error('Error fetching dashboard schedules:', Error);
-            res.status(500).json({ Error: 'Failed to retrieve dashboard schedules.', Details: Error.Message });
+            res.status(500).json({ Error: 'Failed to retrieve dashboard schedules.', Details: Error.message });
         }
     },
 };

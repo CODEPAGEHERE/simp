@@ -25,11 +25,9 @@ const GetMeController = {
                 return res.status(404).json({ Error: 'User not found for the provided token.' });
             }
 
-            // Map Prisma's camelCase output to PascalCase for the response JSON
             const UserResponse = {
                 Id: User.id,
                 Username: User.username,
-                Email: User.email,
                 Name: User.name,
                 PhoneNo: User.phoneNo,
                 CreatedAt: User.createdAt,
@@ -39,7 +37,7 @@ const GetMeController = {
 
         } catch (Error) {
             console.error('Error fetching user data in GetMeController:', Error);
-            res.status(500).json({ Error: 'Failed to retrieve user data.', Details: Error.Message });
+            res.status(500).json({ Error: 'Failed to retrieve user data.', Details: Error.message });
         }
     },
 };
