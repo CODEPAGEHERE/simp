@@ -1,57 +1,145 @@
-// src/components/Loader.jsx
 import React from 'react';
 import styled from 'styled-components';
 
 const Loader = () => {
   return (
     <StyledWrapper>
-      <div className="spinner">
-        <div className="spinner1" />
+      <div className="loader">
+        <div className="intern">
+        </div>
+        <div className="external-shadow">
+          <div className="central">
+          </div>
+        </div>
       </div>
     </StyledWrapper>
   );
 }
 
 const StyledWrapper = styled.div`
-  /* Overlay styles - CRITICAL for covering the screen */
-  position: fixed; /* Position fixed to cover the entire viewport */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent dark background */
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999; /* Ensure it's on top of everything else */
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
 
-  /* Spinner styles (as you provided) */
-  .spinner {
-    background-image: linear-gradient(rgb(186, 66, 255) 35%,rgb(0, 225, 255));
-    width: 100px;
-    height: 100px;
-    animation: spinning82341 1.7s linear infinite;
-    text-align: center;
-    border-radius: 50px;
-    filter: blur(1px);
-    box-shadow: 0px -5px 20px 0px rgb(186, 66, 255), 0px 5px 20px 0px rgb(0, 225, 255);
-    position: relative; /* Needed for positioning spinner1 inside */
+  .loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: not-allowed;
+    scale: 0.7;
   }
 
-  .spinner1 {
-    background-color: rgb(36, 36, 36);
-    width: 100px; /* Same size as parent to fully cover */
-    height: 100px; /* Same size as parent to fully cover */
-    border-radius: 50px;
-    filter: blur(10px);
-    position: absolute; /* Position absolutely within .spinner */
-    top: 0;
-    left: 0;
+  .central {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 10em;
+    height: 10em;
+    border-radius: 50%;
+    box-shadow: 0.5em 1em 1em red,
+      -0.5em 0.5em 1em orange,
+      0.5em -0.5em 1em orangered,
+      -0.5em -0.5em 1em yellow;
   }
 
-  @keyframes spinning82341 {
-    to {
+  .external-shadow {
+    width: 10em;
+    height: 10em;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: 0.5em 0.5em 3em red,
+      -0.5em 0.5em 3em orange,
+      0.5em -0.5em 3em orangered,
+      -0.5em -0.5em 3em yellow;
+    z-index: 999;
+    animation: rotate 3s linear infinite;
+    background-color: #212121;
+  }
+
+  .intern {
+    position: absolute;
+    color: white;
+    z-index: 9999;
+  }
+
+  .intern::before {
+    content: "100%";
+    animation: percent 2s ease-in-out infinite;
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    50% {
+      transform: rotate(180deg);
+    }
+
+    100% {
       transform: rotate(360deg);
+    }
+  }
+
+  @keyframes percent {
+    0% {
+      content: '0%';
+    }
+
+    25% {
+      content: '25%';
+    }
+
+    33% {
+      content: '33%';
+    }
+
+    42% {
+      content: '42%';
+    }
+
+    51% {
+      content: '51%';
+    }
+
+    67% {
+      content: '67%';
+    }
+
+    74% {
+      content: '74%';
+    }
+
+    75% {
+      content: '75%';
+    }
+
+    86% {
+      content: '86%';
+    }
+
+    95% {
+      content: '95%';
+    }
+
+    98% {
+      content: '98%';
+    }
+
+    99% {
+      content: '99%';
     }
   }
 `;

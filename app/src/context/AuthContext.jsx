@@ -7,27 +7,17 @@ export const AuthProvider = ({ children }) => {
     const Navigate = useNavigate();
     const Location = useLocation();
 
-    const [IsAuthenticated, setIsAuthenticated] = useState(() => {
-        return !!localStorage.getItem('jwtToken');
-    });
-
+    const [IsAuthenticated, setIsAuthenticated] = useState(false);
     const [UserData, setUserData] = useState(null);
 
     const PublicAccessiblePaths = ['/login', '/register', '/forgot-password', '/'];
 
-    const FetchUserData = async (Token) => {
-        if (!Token) {
-            setUserData(null);
-            return;
-        }
+    const FetchUserData = async () => {
         try {
             const ApiBaseUrl = import.meta.env.VITE_SIMP_API_POINT;
             const Response = await fetch(`${ApiBaseUrl}/auth/me`, {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${Token}`,
-                },
+                credentials: 'include', // Include cookies in the request
             });
 
             if (Response.ok) {
@@ -40,10 +30,8 @@ export const AuthProvider = ({ children }) => {
                     PhoneNo: Data.PhoneNo,
                     CreatedAt: Data.CreatedAt,
                 });
+                setIsAuthenticated(true);
             } else {
-                const errorBody = await Response.json();
-                console.error('ERROR: AuthContext: Failed to fetch user data from /auth/me. Status:', Response.status, 'Body:', errorBody);
-                localStorage.removeItem('jwtToken');
                 setIsAuthenticated(false);
                 setUserData(null);
                 if (!PublicAccessiblePaths.includes(Location.pathname)) {
@@ -56,86 +44,48 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const Login = (Token, Person = null) => {
-        console.log("DEBUG: AuthContext.Login: Function called.");
+    const Login = async () => {
         try {
-            localStorage.setItem('jwtToken', Token);
-            console.log("DEBUG: AuthContext.Login: jwtToken saved to localStorage.");
-        } catch (e) {
-            console.error("ERROR: AuthContext.Login: Error setting token in localStorage:", e);
-        }
-
-        setIsAuthenticated(true);
-        console.log("DEBUG: AuthContext.Login: IsAuthenticated state set to true (will reflect on next render).");
-
-        if (Person) {
-            setUserData({
-                UserId: Person.Id,
-                Username: Person.Username,
-                Name: Person.Name,
-                PhoneNo: Person.PhoneNo,
-                CreatedAt: Person.CreatedAt,
+            const ApiBaseUrl = import.meta.env.VITE_SIMP_API_POINT;
+            const Response = await fetch(`${ApiBaseUrl}/auth/login`, {
+                method: 'POST',
+                credentials: 'include', // Include cookies in the request
             });
-            console.log("DEBUG: AuthContext.Login: UserData set directly from login response (mapped to UserId).");
-        } else {
-            FetchUserData(Token);
-            console.log("DEBUG: AuthContext.Login: Calling FetchUserData as Person was null.");
+
+            if (Response.ok) {
+                await FetchUserData();
+                Navigate('/dashboard');
+            } else {
+                console.error('ERROR: AuthContext: Login failed');
+            }
+        } catch (Error) {
+            console.error('ERROR: AuthContext: Network error while logging in:', Error);
         }
     };
 
-    const Logout = () => {
-        console.log("DEBUG: AuthContext.Logout: Function called. Attempting to log out.");
-        localStorage.removeItem('jwtToken');
-        console.log("DEBUG: AuthContext.Logout: jwtToken removed from localStorage.");
-        setIsAuthenticated(false);
-        setUserData(null);
-        Navigate('/');
-        console.log("DEBUG: AuthContext.Logout: Navigation to '/' attempted.");
+    const Logout = async () => {
+        try {
+            const ApiBaseUrl = import.meta.env.VITE_SIMP_API_POINT;
+            const Response = await fetch(`${ApiBaseUrl}/auth/logout`, {
+                method: 'POST',
+                credentials: 'include', // Include cookies in the request
+            });
+
+            if (Response.ok) {
+                setIsAuthenticated(false);
+                setUserData(null);
+                Navigate('/');
+            } else {
+                console.error('ERROR: AuthContext: Logout failed');
+            }
+        } catch (Error) {
+            console.error('ERROR: AuthContext: Network error while logging out:', Error);
+        }
     };
 
     useEffect(() => {
-        const Token = localStorage.getItem('jwtToken');
-        console.log("DEBUG: AuthContext useEffect: Initial check. Token:", Token ? "Present" : "Missing", "IsAuthenticated:", IsAuthenticated, "Path:", Location.pathname);
-
-        if (Token) {
-            if (!IsAuthenticated) {
-                setIsAuthenticated(true);
-            }
-            if (!UserData) {
-                FetchUserData(Token);
-            }
-
-            if (IsAuthenticated && Location.pathname === '/login') {
-                console.log("DEBUG: AuthContext useEffect: Authenticated, on /login, redirecting to /dashboard.");
-                Navigate('/dashboard');
-            }
-        } else {
-            setIsAuthenticated(false);
-            setUserData(null);
-            console.log("DEBUG: AuthContext useEffect: No token found. IsAuthenticated set to false.");
-        }
-
-        const HandleStorageChange = (Event) => {
-            if (Event.key === 'jwtToken') {
-                const NewToken = Event.newValue;
-                setIsAuthenticated(!!NewToken);
-                if (NewToken) {
-                    FetchUserData(NewToken);
-                } else {
-                    setUserData(null);
-                    if (!PublicAccessiblePaths.includes(Location.pathname)) {
-                        Navigate('/login');
-                    }
-                }
-            }
-        };
-
-        window.addEventListener('storage', HandleStorageChange);
-
-        return () => {
-            window.removeEventListener('storage', HandleStorageChange);
-        };
-    }, [IsAuthenticated, UserData, Location.pathname, Navigate]);
+        FetchUserData();
+    }, [Location.pathname]);
 
     const ContextValue = {
         IsAuthenticated,

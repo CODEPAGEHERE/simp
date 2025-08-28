@@ -8,7 +8,7 @@
   min-height: 100vh; /* Ensure it takes full viewport height */
   justify-content: center; /* Center content vertically if not enough to fill */
   align-items: center; /* Center content horizontally */
-  
+
 }
 
 .landing-main-content {
@@ -116,23 +116,27 @@
     max-width: 250px;
     margin-top: 20px;
   }
-  
+
   /* Buttons should inherit from Bootstrap first, then customized */
   .simp-btn-start {
-    padding: 0.8rem 2rem;
-    border-radius: 25px;
-    background-color: #e0e0e0;
-    color: #333;
-    border: 2px solid black;  
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-size: 1rem;
-  }
+  padding: 0.8rem 2rem;
+  border-radius: 80px !important;
+  color: white !important;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.5s ease;
+  font-size: 1rem;
+  background-image: linear-gradient(to right, #FF1C67, #D9034A) !important;
+  background-size: 200% 100%;
+  background-position: left;
+  border: none !important;
+}
 
-  .simp-btn-start:hover {
-    background-color: #d0d0d0;
-  }
+.simp-btn-start:hover {
+  background-image: linear-gradient(to right, #D9034A, #FF1C67);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
 
   .or-separator {
     display: block;
@@ -144,14 +148,14 @@
   .lnkk { /* This class is for signup, potentially specific to mobile link */
     background: none;
     border: none;
-    color: #007bff !important;  
-    font-weight: 600;  
-    text-decoration: underline !important;  
+    color: #007bff !important;
+    font-weight: 600;
+    text-decoration: underline !important;
     font-size: 1rem;
     transition: color 0.3s ease;
-    padding: 0;  
+    padding: 0;
   }
-  
+
   .lnk{ /* This class is for start button */
     border: 1px solid black !important;
     border-radius:90px;

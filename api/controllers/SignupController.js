@@ -1,100 +1,125 @@
 const { PrismaClient } = require('@prisma/client');
 const Bcrypt = require('bcryptjs');
+const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
+const validator = require('validator');
 
 const Prisma = new PrismaClient();
 
 const SignupController = {
     Signup: async (req, res) => {
-        const { name, phoneNo, username, password } = req.body;
+        const { Name, Category, PhoneNo, Email, Username, Password } = req.body;
 
-        const ProcessedName = name ? name.trim() : '';
-        let ProcessedPhoneNo = phoneNo;
-        const CleanUsername = username ? username.toLowerCase().trim() : '';
-        const CleanPassword = password ? password.trim() : '';
-
-        if (!ProcessedName || !ProcessedPhoneNo || !CleanUsername || !CleanPassword) {
-            return res.status(400).json({ Message: 'All fields (name, phone number, username, password) are required.' });
+        if (!Name || !PhoneNo || !Email || !Username || !Password || !Category) {
+            return res.status(400).json({ Message: 'Please fill in all fields.' });
         }
 
-        if (ProcessedName.length < 5 || ProcessedName.length > 50) {
-            return res.status(400).json({ Message: 'Your Name must be between 5 and 50 characters long.' });
-        }
-        if (!/^[a-zA-Z\s]+$/.test(ProcessedName)) {
-            return res.status(400).json({ Message: 'Name can only contain alphabets (A-Z, a-z) and spaces.' });
+        if (!/^[a-zA-Z\s]{5,}$/.test(Name)) {
+            return res.status(400).json({ Message: 'Full name must be at least 5 characters long and contain only alphabets and spaces.' });
         }
 
-        ProcessedPhoneNo = ProcessedPhoneNo.replace(/[^+\d]/g, '');
+        const ProcessedName = Name.toLowerCase().trim();
+        const ProcessedUsername = Username.trim().toLowerCase();
+        const ProcessedEmail = Email.trim().toLowerCase();
 
-        if (ProcessedPhoneNo.startsWith('0')) {
-            ProcessedPhoneNo = '+234' + ProcessedPhoneNo.substring(1);
-        } else if (!ProcessedPhoneNo.startsWith('+234')) {
-            ProcessedPhoneNo = '+234' + ProcessedPhoneNo;
+        try {
+            const phoneNumber = phoneUtil.parse(PhoneNo);
+            if (!phoneUtil.isValidNumber(phoneNumber)) {
+                return res.status(400).json({ Message: 'Invalid phone number. Please enter a valid phone number.' });
+            }
+        } catch (Error) {
+            return res.status(400).json({ Message: 'Invalid phone number. Please enter a valid phone number.' });
         }
 
-        if ((ProcessedPhoneNo.match(/\+/g) || []).length > 1) {
-            return res.status(400).json({ Message: 'Invalid phone number format: "+" can only appear at the beginning.' });
+        if (!validator.isEmail(ProcessedEmail)) {
+            return res.status(400).json({ Message: 'Invalid email address.' });
         }
 
-        if (!/^\+234[789]\d{9}$/.test(ProcessedPhoneNo)) {
-            return res.status(400).json({ Message: 'Invalid Nigerian phone number format. Must start with +234, 0, or implied +234, followed by 7, 8, or 9 and 9 more digits.' });
+        if (!/^[a-zA-Z0-9]{5,}$/.test(ProcessedUsername) || !validator.isAlphanumeric(ProcessedUsername)) {
+            return res.status(400).json({ Message: 'Username must be at least 5 characters long and contain only alphabets and numbers.' });
         }
 
-        if (!/^[a-z0-9]+$/.test(CleanUsername)) {
-            return res.status(400).json({ Message: 'Username can only contain lowercase letters and numbers, no special characters or spaces.' });
-        }
-
-        const AllowedPasswordCharsRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~~`]+$/;
-
-        if (CleanPassword.length < 9) {
-            return res.status(400).json({ Message: 'Password must be at least 10 characters long.' });
-        }
-        if (!AllowedPasswordCharsRegex.test(CleanPassword)) {
-            return res.status(400).json({
-                Message: 'Password can only contain letters, numbers, and common special characters (e.g., !@#$%^&*). No spaces allowed.'
-            });
-        }
-
-        if (CleanUsername === CleanPassword) {
+        if (ProcessedUsername === Password.toLowerCase()) {
             return res.status(400).json({ Message: 'Username and password cannot be the same.' });
         }
 
+        if (Password.length < 6 || Password.length > 20 || Password.includes(' ')) {
+            return res.status(400).json({ Message: 'Password must be between 6 and 20 characters long and contain no spaces.' });
+        }
+
+        const CategoryData = await Prisma.category.findUnique({
+            where: { name: Category },
+        });
+
+        if (!CategoryData) {
+            return res.status(400).json({ Message: 'Invalid category.' });
+        }
+
+        const CategoryId = CategoryData.id;
+
+        const Role = await Prisma.role.findUnique({
+            where: { name: 'scheduler' },
+        });
+
+        if (!Role) {
+            return res.status(500).json({ Message: 'Scheduler role not found.' });
+        }
+
+        const RoleId = Role.id;
+
         try {
             const ExistingPersonByPhoneNo = await Prisma.person.findUnique({
-                where: { phoneNo: ProcessedPhoneNo },
+                where: { phoneNo: PhoneNo },
             });
             if (ExistingPersonByPhoneNo) {
                 return res.status(409).json({ Message: 'A person with this phone number already exists.' });
             }
 
             const ExistingPersonByUsername = await Prisma.person.findUnique({
-                where: { username: CleanUsername },
+                where: { username: ProcessedUsername },
             });
             if (ExistingPersonByUsername) {
                 return res.status(409).json({ Message: 'A person with this username already exists.' });
             }
 
-            const PasswordHash = await Bcrypt.hash(CleanPassword, 10);
+            const ExistingPersonByEmail = await Prisma.person.findUnique({
+                where: { email: ProcessedEmail },
+            });
+            if (ExistingPersonByEmail) {
+                return res.status(409).json({ Message: 'A person with this email already exists.' });
+            }
+
+            const PasswordHash = await Bcrypt.hash(Password, 10);
 
             const NewPerson = await Prisma.person.create({
                 data: {
                     name: ProcessedName,
-                    phoneNo: ProcessedPhoneNo,
-                    username: CleanUsername,
+                    categoryId: CategoryId,
+                    phoneNo: PhoneNo,
+                    email: ProcessedEmail,
+                    username: ProcessedUsername,
                     passwordHash: PasswordHash,
+                    roleId: RoleId,
                 },
                 select: {
                     id: true,
                     name: true,
+                    categoryId: true,
                     phoneNo: true,
+                    email: true,
                     username: true,
+                    roleId: true,
                     createdAt: true,
                 }
             });
 
             res.status(201).json({
-                Message: 'This Person is registered successfully!',
-                Person: NewPerson,
-            });
+                      Message: 'This Person is registered successfully!',
+                      Person: {
+                          username: NewPerson.username,
+                          email: NewPerson.email,
+                          name: NewPerson.name,
+                          },
+                              });
 
         } catch (Error) {
             console.error('Error during person signup:', Error);
@@ -106,7 +131,10 @@ const SignupController = {
                 if (Error.meta.target.includes('username')) {
                     return res.status(409).json({ Message: 'A person with this username already exists.' });
                 }
-                return res.status(409).json({ Message: 'A person with conflicting unique data already exists.' });
+                if (Error.meta.target.includes('email')) {
+                    return res.status(409).json({ Message: 'A person with this email already exists.' });
+                }
+                return res.status(409).json({ Message: 'A person with the same  data already exists.' });
             }
 
             res.status(500).json({ Message: 'An unexpected error occurred during registration.' });

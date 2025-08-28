@@ -16,7 +16,7 @@ const Home = () => {
                 <p className="landing-subtitle-small">Any Where, Any Time</p>
 
                 <div className="landing-actions">
-                    <Link to="/login" className="btn simp-btn-start lnk">Start</Link>
+                    <Link to="/login" className="btn simp-btn-start lnk">Quick Schedule</Link>
                     <span className="or-separator">OR</span>
                     <Link to="/register" className="btn simp-btn-signup-mobile lnkk">Signup</Link>
                 </div>

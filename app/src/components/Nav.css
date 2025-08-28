@@ -14,7 +14,7 @@
   animation: fadeInDown 1s forwards 0.5s;
   margin-left: 200px;
   margin-right: 200px;
-  height:70px; 
+  height:70px;
 }
 
 .simp-navbar-inner {
@@ -67,7 +67,7 @@
 }
 
 .simp-navbar-nav li a:hover {
-  color: #007bff;
+  color: #D9034A;
 }
 
 /* --- Desktop Signup Button --- */
@@ -82,6 +82,16 @@
   transition: all 0.3s ease;
   border: 1px solid #333;
   color: #333;
+}
+
+.simp-btn-login {
+  padding: 0.6rem 1.5rem;
+  border-radius: 80px !important ;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 1px solid #333;
+  color: white !important;
+  background-color: black !important;
 }
 
 .simp-btn-signup:hover {
@@ -179,7 +189,7 @@
   /* Hide desktop nav and auth elements on mobile */
   .simp-navbar-nav:not(.open),
   .simp-navbar-auth {
-    display: none;
+    display: none !important;
   }
 
   /* Mobile Navigation Dropdown (Activated by .open class) */
@@ -261,4 +271,5 @@
   .simp-navbar-nav .simp-btn-signup-mobile:hover {
     background-color: #333; /* Darker grey on hover */
   }
+
 }

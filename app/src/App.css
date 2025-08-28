@@ -13,34 +13,28 @@ html, body {
   flex-direction: column;
   flex-grow: 1;
   position: relative;
-  z-index: 1; 
-
- 
-  background-color: #f8f8f8;
-
-  background-image:
-    
-    radial-gradient(circle at center, 
-                    rgba(65, 105, 225, 0.15) 0%, 
-                    transparent 60%), 
-    
-    radial-gradient(circle at center, 
-                    rgba(0, 102, 204, 0.15) 0%, 
-                    transparent 60%);
-
-  /* Background size and position for the two stains (crucial for controlled circularity and placement) */
-  background-size:
-    min(40vw, 300px) min(40vh, 300px), /* Smaller size to keep them more contained */
-    min(40vw, 300px) min(40vh, 300px);
-
-  background-position:
-    20% 20%, /* Position the top-left stain: 20% from left, 20% from top */
-    80% 80%; /* Position the bottom-right stain: 80% from left, 80% from top */
-
-  background-repeat: no-repeat; /* Crucial: ensures stains don't tile */
-  background-attachment: fixed; /* Keep background fixed while content scrolls */
+  z-index: 1;
 }
 
+@media (min-width: 992px) {
+  #root, .App {
+    background-image: linear-gradient(to bottom left, #D4E0EC 20%, #ECD4D9);
+    background-size: 100% 100%;
+    background-color: transparent;
+    background-attachment: fixed;
+  }
+}
+
+@media (max-width: 991px) {
+  #root, .App {
+    background-image: linear-gradient(to bottom, #D4E0EC 25%, #ECD4D9);
+    background-size: 100% 100%;
+    background-color: transparent;
+    background-attachment: fixed;
+    min-height: 100vh;
+    height: auto;
+  }
+}
 
 /* Animations */
 @keyframes fadeInDown {
@@ -51,17 +45,5 @@ html, body {
   to {
     opacity: 1;
     transform: translate3d(0, 0, 0);
-  }
-}
-
-/* ========================================= */
-/* --- MOBILE STYLES (MAX-WIDTH MEDIA QUERY) --- */
-/* ========================================= */
-@media (max-width: 991px) {
-
-  #root, .App {
-    background-image: none; /* Remove all background gradients on mobile */
-    background-color: transparent; /* No background color on mobile */
-    background-attachment: scroll; /* Reset if fixed for desktop */
   }
 }

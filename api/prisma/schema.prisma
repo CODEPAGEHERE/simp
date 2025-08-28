@@ -2,13 +2,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
-
 
 // Enums to define possible statuses
 enum ScheduleStatus {
@@ -26,31 +23,45 @@ enum SubTaskStatus {
   PAUSED        // Optional: if you want to track pauses
 }
 
+// Role model
+model Role {
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  persons  Person[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
+// Category model
+model Category {
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  persons  Person[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-
-//Person model
-
+// Person model
 model Person {
-  id           Int      @id @default(autoincrement())
+  id           String   @id @default(uuid())
   name         String
-  phoneNo      String   @unique
   username     String   @unique
   passwordHash String
+  phoneNo      String   @unique
+  email        String   @unique
+  roleId       Int
+  role         Role     @relation(fields: [roleId], references: [id])
+  categoryId   Int
+  category     Category @relation(fields: [categoryId], references: [id])
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   schedules    Schedule[]
 }
 
-
-
-
-
-//Schedule model
-
+// Schedule model
 model Schedule {
-  id                   Int           @id @default(autoincrement())
+  id                   String        @id @default(uuid())
   title                String
   description          String?
   totalDurationSeconds Int
@@ -60,7 +71,7 @@ model Schedule {
   actualStartTime      DateTime?      // When the schedule actually started (nullable)
   actualEndTime        DateTime?      // When the schedule actually finished (nullable)
 
-  personId             Int
+  personId             String
   person               Person        @relation(fields: [personId], references: [id])
 
   subTasks             SubTask[]
@@ -69,15 +80,9 @@ model Schedule {
   updatedAt            DateTime      @updatedAt
 }
 
-
-
-
-
-
 // SubTask model
-
 model SubTask {
-  id              Int           @id @default(autoincrement())
+  id              String        @id @default(uuid())
   name            String
   durationSeconds Int
 
@@ -88,7 +93,7 @@ model SubTask {
   actualDurationSeconds Int?    // Calculated actual duration (nullable)
   notes           String?       // Optional: For user notes like "finished early/late"
 
-  scheduleId      Int
+  scheduleId      String
   schedule        Schedule      @relation(fields: [scheduleId], references: [id])
 
   createdAt       DateTime      @default(now())
