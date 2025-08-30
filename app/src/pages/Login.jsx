@@ -1,5 +1,3 @@
-// File: frontend/src/pages/Login.jsx
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Alert, InputGroup } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,13 +5,17 @@ import gsap from 'gsap';
 import '../App.css';
 import './Login.css';
 import Loader from '../components/Loader';
-import { useAuth } from '../context/AuthContext';
+import phoneNumberUtil from 'google-libphonenumber';
+import { useAuth } from '../context/AuthContext'; // Import useAuth
+
+const phoneUtil = phoneNumberUtil.PhoneNumberUtil.getInstance();
+
+const usernameRegex = /^[a-zA-Z0-9]{5,20}$/;
 
 const Login = () => {
     const Navigate = useNavigate();
     const FormContainerRef = useRef(null);
-    const { Login: AuthContextLogin } = useAuth(); // FIXED: AuthContext's function is named 'Login' (PascalCase)
-                                                   // Keeping your alias 'AuthContextLogin' but pointing to correct source.
+    const { login } = useAuth(); // Call useAuth here
 
     const [Identifier, setIdentifier] = useState('');
     const [Password, setPassword] = useState('');
@@ -58,29 +60,54 @@ const Login = () => {
         }
 
         try {
+            if (usernameRegex.test(Identifier)) {
+                // Identifier is a valid username
+            } else {
+                const phoneNumber = phoneUtil.parse(Identifier);
+                if (!phoneUtil.isValidNumber(phoneNumber)) {
+                    setMessage('Invalid username or phone number.');
+                    setMessageType('danger');
+                    gsap.to(FormContainerRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+                    setIsLoading(false);
+                    return;
+                }
+            }
+        } catch (Error) {
+            setMessage('Invalid username or phone number.');
+            setMessageType('danger');
+            gsap.to(FormContainerRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+            setIsLoading(false);
+            return;
+        }
+
+        if (Password.length < 6) {
+            setMessage('Password must be at least 6 characters long.');
+            setMessageType('danger');
+            gsap.to(FormContainerRef.current, { x: 5, duration: 0.1, repeat: 3, yoyo: true, clearProps: "x" });
+            setIsLoading(false);
+            return;
+        }
+
+        try {
             const Response = await fetch(`${ApiBaseUrl}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ Identifier: Identifier, Password: Password }),
+                credentials: 'include',
+                body: JSON.stringify({ identifier: Identifier.trim(), password: Password.trim() }),
             });
 
-            const Data = await Response.json();
-
             if (Response.ok) {
-                setMessage(Data.Message || 'Login successful!');
+                setMessage('Login successful!');
                 setMessageType('success');
-                if (Data.Token) {
-                    AuthContextLogin(Data.Token, Data.Person); // Calling the correctly aliased function
-                }
-
+                login(); // Use the login function here
                 setTimeout(() => {
                     setIsLoading(false);
-                    Navigate('/dashboard');
+                    Navigate('/dashboard', { replace: true });
                 }, 1000);
-
             } else {
+                const Data = await Response.json();
                 let ErrorMessage = 'An unexpected error occurred. Please try again.';
 
                 if (Response.status === 429) {
@@ -108,12 +135,11 @@ const Login = () => {
     return (
         <>
             {IsLoading && <Loader />}
-
             <div className="login-page-background">
                 <Row className="justify-content-center w-100">
                     <Col xs={12} sm={8} md={5} lg={4} className="mt-5">
-                        <Container ref={FormContainerRef} className="text-center p-4 p-md-5 rounded shadow-sm bg-white form-container">
-                            <h2 className="text-dark fw-bold mb-4">Login to Simp Account</h2>
+                        <Container ref={FormContainerRef} className="text-center p-8 p-md-4 rounded shadow-lg bg-whte form-container">
+                            <h2 className="text-dark fw-bold mb-4">Login Your Simp Account</h2>
 
                             <Form onSubmit={HandleSubmit}>
                                 <Form.Group className="mb-3 text-start" controlId="formIdentifier">

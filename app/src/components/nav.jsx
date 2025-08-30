@@ -1,12 +1,10 @@
-// File: frontend/src/components/Nav.jsx
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './Nav.css';
 import { useAuth } from '../context/AuthContext';
 
 const Nav = () => {
-    const { IsAuthenticated, Logout } = useAuth();
+    const { isAuthenticated, isLoading, logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleMenu = () => {
@@ -14,21 +12,27 @@ const Nav = () => {
     };
 
     const handleLogoutClick = () => {
-        Logout();
+        logout();
         setIsMenuOpen(false);
     };
 
     useEffect(() => {
-        if (!IsAuthenticated && isMenuOpen) {
+        if (!isAuthenticated && isMenuOpen) {
             setIsMenuOpen(false);
         }
-    }, [IsAuthenticated, isMenuOpen]);
+    }, [isAuthenticated, isMenuOpen]);
+
+    if (isLoading) {
+        return null; // or a loader component
+
+        console.log('isAuthenticated:', isAuthenticated);
+    }
 
     return (
         <nav className="simp-navbar">
             <div className="simp-navbar-inner">
                 <div className="simp-navbar-brand">
-                    <Link to={IsAuthenticated ? "/dashboard" : "/"}>
+                    <Link to={isAuthenticated ? "/dashboard" : "/"}>
                         <img src="/logoh.png" alt="Simp Logo" className="logo-icon" />
                         <span className="logo-text">Simp</span>
                     </Link>
@@ -45,15 +49,18 @@ const Nav = () => {
                 </button>
 
                 <ul className={`simp-navbar-nav ${isMenuOpen ? 'open' : ''}`}>
-                    {/* These links are always available */}
-                    <li><Link to="/make-schedule" onClick={() => setIsMenuOpen(false)}>Make Schedule</Link></li>
-                    <li><Link to="/ongoing-schedule" onClick={() => setIsMenuOpen(false)}>Ongoing Schedule</Link></li>
-                    <li><Link to="/saved-schedule" onClick={() => setIsMenuOpen(false)}>Saved Schedule</Link></li>
+                    {isAuthenticated && (
+                        <>
+                            <li><Link to="/make-schedule" onClick={() => setIsMenuOpen(false)}>Make Schedule</Link></li>
+                            <li><Link to="/ongoing-schedule" onClick={() => setIsMenuOpen(false)}>Ongoing Schedule</Link></li>
+                            <li><Link to="/saved-schedule" onClick={() => setIsMenuOpen(false)}>Saved Schedule</Link></li>
+                        </>
+                    )}
                     <li><Link to="/settings" onClick={() => setIsMenuOpen(false)}>Setting</Link></li>
                     <li><Link to="/help" onClick={() => setIsMenuOpen(false)}>Help</Link></li>
 
                     {/* Conditional rendering for Auth buttons in mobile menu */}
-                    {IsAuthenticated ? (
+                    {isAuthenticated ? (
                         <li className="mobile-auth-item">
                             <button className="btn simp-btn-logout-mobile" onClick={handleLogoutClick}>Logout</button>
                         </li>
@@ -71,7 +78,7 @@ const Nav = () => {
 
                 {/* Desktop-only Auth buttons */}
                 <div className="simp-navbar-auth">
-                    {IsAuthenticated ? (
+                    {isAuthenticated ? (
                         <button className="btn btn-outline-dark simp-btn-logout" onClick={handleLogoutClick}>Logout</button>
                     ) : (
                         <>

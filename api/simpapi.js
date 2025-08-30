@@ -2,11 +2,10 @@ if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
 
-
 const Express = require('express');
 const Cors = require('cors');
+const cookieParser = require('cookie-parser');
 const { PrismaClient } = require('@prisma/client');
-
 
 // Routes
 const AuthRoutes = require('./routes/AuthRoutes');
@@ -21,6 +20,8 @@ const AllowedOrigin = process.env.CORS_ORIGIN;
 
 
 
+
+
 App.use(Cors({
     origin: AllowedOrigin,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -28,6 +29,7 @@ App.use(Cors({
 }));
 
 App.use(Express.json());
+App.use(cookieParser());
 
 
 
@@ -45,6 +47,7 @@ App.use('/dashboard', DashboardRoutes);
 App.get('/', (req, res) => {
     res.status(200).json({ Message: ' SimpApi is running successfully!' });
 });
+
 // Error handling middleware
 App.use((err, req, res, next) => {
     console.error(err.stack);
@@ -53,7 +56,12 @@ App.use((err, req, res, next) => {
 
 
 
+
+
 module.exports = App;
+
+
+
 
 
 
@@ -67,6 +75,7 @@ if (process.env.NODE_ENV !== 'production') {
             .catch((e) => console.error(" SimpDB connection error:", e));
     });
 }
+
 process.on('beforeExit', async () => {
     await Prisma.$disconnect();
 });

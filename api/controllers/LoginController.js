@@ -1,6 +1,8 @@
 const { PrismaClient } = require('@prisma/client');
 const Bcrypt = require('bcryptjs');
-const Jwt = require('jsonwebtoken');
+const { generateToken } = require('../middleware/TokenUtil');
+const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
+const validator = require('validator');
 
 const Prisma = new PrismaClient();
 
@@ -12,30 +14,44 @@ const LoginController = {
             return res.status(400).json({ Message: 'Username/Phone number and password are required.' });
         }
 
+        // Validate identifier (username or phone number)
+        const phoneNumberRegex = /^\+?\d+$/;
+        const usernameRegex = /^[a-zA-Z0-9]{3,20}$/;
+
+        let isValidPhoneNumber = false;
+        let isValidUsername = false;
+
+        if (phoneNumberRegex.test(identifier)) {
+            try {
+                const phoneNumber = phoneUtil.parse(identifier);
+                isValidPhoneNumber = phoneUtil.isValidNumber(phoneNumber);
+            } catch (error) {
+                isValidPhoneNumber = false;
+            }
+        } else if (usernameRegex.test(identifier)) {
+            isValidUsername = true;
+        }
+
+        if (!isValidPhoneNumber && !isValidUsername) {
+            return res.status(400).json({ Message: 'Invalid username or phone number format.' });
+        }
+
+        // Validate password
+        if (!validator.isLength(password, { min: 6, max: 20 })) {
+            return res.status(400).json({ Message: 'Password should be between 6 and 20 characters.' });
+        }
+
         try {
             let Person = null;
 
-            const CleanIdentifier = identifier.toLowerCase().trim();
-            Person = await Prisma.person.findUnique({
-                where: { username: CleanIdentifier },
-            });
-
-            if (!Person) {
-                let ProcessedPhoneNo = identifier;
-
-                ProcessedPhoneNo = ProcessedPhoneNo.replace(/[^+\d]/g, '');
-
-                if (ProcessedPhoneNo.startsWith('0')) {
-                    ProcessedPhoneNo = '+234' + ProcessedPhoneNo.substring(1);
-                } else if (!ProcessedPhoneNo.startsWith('+234')) {
-                    ProcessedPhoneNo = '+234' + ProcessedPhoneNo;
-                }
-
-                if (/^\+234[789]\d{9}$/.test(ProcessedPhoneNo)) {
-                    Person = await Prisma.person.findUnique({
-                        where: { phoneNo: ProcessedPhoneNo },
-                    });
-                }
+            if (isValidUsername) {
+                Person = await Prisma.person.findUnique({
+                    where: { username: identifier },
+                });
+            } else if (isValidPhoneNumber) {
+                Person = await Prisma.person.findUnique({
+                    where: { phoneNo: identifier },
+                });
             }
 
             if (!Person) {
@@ -48,28 +64,24 @@ const LoginController = {
                 return res.status(401).json({ Message: 'Invalid username or password.' });
             }
 
-            const TokenPayload = {
+            const Payload = {
                 UserId: Person.id,
                 Username: Person.username,
+                RoleId: Person.roleId,
+                CategoryId: Person.categoryId,
             };
 
-            const Token = Jwt.sign(TokenPayload, process.env.JWT_SECRET, {
-                expiresIn: '1h',
+            const Token = generateToken(Payload);
+
+            res.cookie('Simp_token', Token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                maxAge: 3 * 60 * 60 * 1000, // 3 hours
             });
-
-            const PersonResponse = {
-                Id: Person.id,
-                Name: Person.name,
-                Username: Person.username,
-                PhoneNo: Person.phoneNo,
-                Email: Person.email,
-                CreatedAt: Person.createdAt,
-            };
 
             res.status(200).json({
                 Message: 'Login successful!',
-                Token: Token,
-                Person: PersonResponse,
             });
 
         } catch (Error) {

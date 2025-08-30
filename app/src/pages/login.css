@@ -11,12 +11,12 @@
     height: auto !important;
     min-height: unset !important;
     max-height: none !important;
-	overflow-y: visible !important;
+    overflow-y: visible !important;
     overflow: visible !important;
     max-width: 500px;
     width: 100%;
-	margin-top:-90px;
-    box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.8); 
+    margin-top: -90px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 5.9), 0px 0px 10px rgba(0, 0, 0, 0.9);
 }
 
 @media (max-width: 767.98px) {
@@ -29,7 +29,7 @@
         padding: 1rem !important;
         margin-top: 50px;
         margin-bottom: 30px;
-        box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.8); 
+        box-shadow: 0px 8px 25px rgba(0, 0, 0, 2.8);
     }
 
     .row.justify-content-center > .col-12 {
@@ -40,11 +40,11 @@
 
 
 .form-container h2 {
-    font-size: 1.8rem; 
+    font-size: 1.8rem;
 }
 
-@media (max-width: 575.98px) { 
+@media (max-width: 575.98px) {
     .form-container h2 {
-        font-size: 1.5rem; 
+        font-size: 1.5rem;
     }
 }
