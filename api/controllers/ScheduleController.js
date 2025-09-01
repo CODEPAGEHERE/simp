@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const Prisma = new PrismaClient();
+const validator = require('validator');
 
 const durationToSeconds = (Duration) => {
     const hh = parseInt(Duration.hh || 0);
@@ -9,101 +10,142 @@ const durationToSeconds = (Duration) => {
 };
 
 const ScheduleController = {
-    CreateSchedule: async (req, res) => {
-        try {
-            const UserId = req.User.UserId;
+      CreateSchedule: async (req, res) => {
+          try {
+            if (!req.user || !req.user.UserId) {
+              return res.status(401).json({ Error: 'Unauthorized: User not found.' });
+            }
+
+            const UserId = req.user.UserId;
             const { mainTask: MainTask, subTasks: SubTasks } = req.body;
 
-            if (!MainTask || !MainTask.name || !MainTask.totalDuration || !UserId) {
-                return res.status(400).json({ Error: 'Missing required main task data or user ID.' });
+            if (!MainTask || !MainTask.name || !MainTask.totalDuration) {
+              return res.status(400).json({ Error: 'Missing required main task data.' });
+            }
+
+            if (!/^[a-zA-Z0-9\s]{5,30}$/.test(MainTask.name)) {
+              return res.status(400).json({ Error: 'Main task name must be between 5 and 30 characters, and can contain letters, numbers, and spaces.' });
+            }
+
+            if (!/^\d{1,2}:\d{1,2}:\d{1,2}$/.test(`${String(MainTask.totalDuration.hh).padStart(2, '0')}:${String(MainTask.totalDuration.mm).padStart(2, '0')}:${String(MainTask.totalDuration.ss).padStart(2, '0')}`)) {
+              return res.status(400).json({ Error: 'Invalid total duration format. Use HH:MM:SS.' });
             }
 
             if (!Array.isArray(SubTasks) || SubTasks.length === 0) {
-                return res.status(400).json({ Error: 'At least one sub-task is required.' });
+              return res.status(400).json({ Error: 'At least one sub-task is required.' });
             }
 
             for (const subTask of SubTasks) {
-                const HasValidDurationComponent = !isNaN(parseInt(subTask.duration.hh)) ||
-                                                   !isNaN(parseInt(subTask.duration.mm)) ||
-                                                   !isNaN(parseInt(subTask.duration.ss));
+              if (!subTask.name || !/^[a-zA-Z0-9\s]{5,30}$/.test(subTask.name)) {
+                return res.status(400).json({ Error: 'Sub-task name must be between 5 and 30 characters, and can contain letters, numbers, and spaces.' });
+              }
 
-                if (!subTask.name || !HasValidDurationComponent) {
-                    return res.status(400).json({ Error: 'Each sub-task must have a name and a valid duration (HH, MM, or SS).' });
-                }
+              if (!/^\d{1,2}:\d{1,2}:\d{1,2}$/.test(`${String(subTask.duration.hh).padStart(2, '0')}:${String(subTask.duration.mm).padStart(2, '0')}:${String(subTask.duration.ss).padStart(2, '0')}`)) {
+                return res.status(400).json({ Error: 'Invalid sub-task duration format. Use HH:MM:SS.' });
+              }
             }
 
             const TotalDurationSeconds = durationToSeconds(MainTask.totalDuration);
 
             const SubTasksToCreate = SubTasks.map(subTask => ({
-                name: subTask.name,
-                durationSeconds: durationToSeconds(subTask.duration),
-                status: 'PENDING'
+              name: subTask.name,
+              durationSeconds: durationToSeconds(subTask.duration),
+              status: 'PENDING'
             }));
 
             const NewSchedule = await Prisma.schedule.create({
-                data: {
-                    title: MainTask.name,
-                    description: MainTask.description || null,
-                    totalDurationSeconds: TotalDurationSeconds,
-                    status: 'PENDING',
-                    person: {
-                        connect: { id: UserId }
-                    },
-                    subTasks: {
-                        createMany: {
-                            data: SubTasksToCreate,
-                        },
-                    },
+              data: {
+                title: MainTask.name,
+                description: MainTask.description || null,
+                totalDurationSeconds: TotalDurationSeconds,
+                status: 'PENDING',
+                person: {
+                  connect: { id: UserId }
                 },
-                include: {
-                    subTasks: true,
-                    person: {
-                        select: { id: true, username: true, name: true }
-                    }
+                subTasks: {
+                  createMany: {
+                    data: SubTasksToCreate,
+                  },
                 },
+              },
+              include: {
+                subTasks: true,
+                person: {
+                  select: { id: true, username: true, name: true }
+                }
+              },
             });
 
-            res.status(201).json(NewSchedule);
+            res.status(201).json({ Message: `Schedule "${NewSchedule.title}" created successfully.` });
 
-        } catch (Error) {
+          } catch (Error) {
             console.error('Error creating schedule:', Error);
             if (Error.code === 'P2002') {
-                res.status(409).json({ Error: 'A schedule with this title already exists.' });
+              res.status(409).json({ Error: 'A schedule with this title already exists.' });
             } else if (Error.code === 'P2025') {
-                res.status(404).json({ Error: 'The specified user does not exist or invalid ID.' });
+              res.status(404).json({ Error: 'The specified user does not exist or invalid ID.' });
             } else {
-                res.status(500).json({ Error: 'Failed to create schedule.', Details: Error.message });
+              res.status(500).json({ Error: 'Failed to create schedule.', Details: Error.message });
             }
-        }
-    },
+          }
+        },
 
-    GetSchedulesForUser: async (req, res) => {
-        try {
-            const UserId = req.User.UserId;
 
-            if (!UserId) {
+
+
+        GetSchedulesForUser: async (req, res) => {
+            try {
+              const UserId = req.user.UserId;
+              const page = parseInt(req.query.page) || 1;
+              const limit = 4;
+
+              if (!UserId) {
                 return res.status(401).json({ Error: 'Unauthorized: User ID not found in token.' });
-            }
+              }
 
-            const UserSchedules = await Prisma.schedule.findMany({
+              const count = await Prisma.schedule.count({
                 where: {
-                    personId: UserId,
+                  personId: UserId,
+                },
+              });
+
+              const UserSchedules = await Prisma.schedule.findMany({
+                where: {
+                  personId: UserId,
                 },
                 include: {
-                    subTasks: true,
+                  subTasks: true,
+                  person: {
+                    select: { id: true, username: true, name: true }
+                  }
                 },
                 orderBy: {
-                    createdAt: 'desc',
+                  createdAt: 'desc',
                 },
-            });
+                take: limit,
+                skip: (page - 1) * limit,
+              });
 
-            res.status(200).json(UserSchedules);
+              const totalPages = Math.ceil(count / limit);
 
-        } catch (Error) {
-            console.error('Error fetching ALL schedules for user:', Error);
-            res.status(500).json({ Error: 'Failed to retrieve schedules.', Details: Error.message });
-        }
-    },
+              res.status(200).json({
+                schedules: UserSchedules,
+                pagination: {
+                  currentPage: page,
+                  totalPages,
+                  totalSchedules: count,
+                  limit,
+                },
+              });
+
+            } catch (Error) {
+              console.error('Error fetching ALL schedules for user:', Error);
+              res.status(500).json({ Error: 'Failed to retrieve schedules.', Details: Error.message });
+            }
+          },
+
+
+
 
     DeleteSchedule: async (req, res) => {
         try {

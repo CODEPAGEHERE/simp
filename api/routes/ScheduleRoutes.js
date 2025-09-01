@@ -2,13 +2,12 @@ const Express = require('express');
 const Router = Express.Router();
 
 const ScheduleController = require('../controllers/ScheduleController');
+const AuthGate = require('../middleware/AuthGate');
 
-//const { Protect } = require('../middleware/AuthMiddleware');
+Router.post('/schedules', AuthGate, ScheduleController.CreateSchedule);
 
-//Router.post('/', Protect, ScheduleController.CreateSchedule);
+Router.get('/schedules/user', AuthGate, ScheduleController.GetSchedulesForUser);
 
-Router.get('/schedules/user',  ScheduleController.GetSchedulesForUser);
-
-Router.delete('/schedules/:id',  ScheduleController.DeleteSchedule);
+Router.delete('/schedules/:id', AuthGate, ScheduleController.DeleteSchedule);
 
 module.exports = Router;

@@ -6,7 +6,7 @@
 
 .simp-navbar {
   border-bottom: 2px solid black;
-  position: sticky;
+  position: sticy;
   top: 0;
   z-index: 1000;
   padding: 1.5rem 0; /* No horizontal padding on the outer navbar itself */
@@ -68,6 +68,7 @@
 
 .simp-navbar-nav li a:hover {
   color: #D9034A;
+  text-decoration: underline;
 }
 
 /* --- Desktop Signup Button --- */
@@ -201,7 +202,7 @@
     top: 100%; /* Position right below the navbar */
     left: 0;
     width: 100%;
-    background-color: #fff;
+    background-color: #FF1C67;
     flex-direction: column;
     /* align-items: center; Removed: Will align items left now */
     gap: 10px; /* Reduced gap between list items */
@@ -224,23 +225,17 @@
   }
 
   .simp-navbar-nav li {
-    width: 100%; /* Ensures list item takes full width of dropdown */
+    width: 50%; /* Ensures list item takes full width of dropdown */
     text-align: left; /* Aligns list item content to the left */
-    padding-left: 20px; /* Add some left padding for alignment with dropdown's padding */
   }
 
   .simp-navbar-nav li a {
     text-decoration: none;
-    color: #333;
+    color: #fff;
     font-size: 1rem; /* Reduced font size for mobile links */
     font-weight: 500;
     display: block;
     padding: 8px 0; /* Reduced padding for tap area */
-  }
-
-  .simp-navbar-nav li a:hover {
-    color: #007bff;
-    background-color: #f5f5f5;
   }
 
   /* Show mobile-specific signup button in the menu */

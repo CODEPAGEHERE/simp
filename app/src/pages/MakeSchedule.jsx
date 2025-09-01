@@ -1,12 +1,9 @@
-// File: src/pages/MakeSchedule.jsx
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert } from 'react-bootstrap'; // REMOVED Spinner import, kept Alert
-import Loader from '../components/Loader'; // ADDED: Your custom Loader component
-// import Nav from '../components/nav'; // Still REMOVED as per previous explicit instruction
-import '../App.css'; // Assuming this imports global styles
-import './makeschedule.css'; // Your specific styles for this page
+import { Alert } from 'react-bootstrap';
+import Loader from '../components/Loader';
+import '../App.css';
+import './makeschedule.css';
 
 const MakeSchedule = () => {
     const navigate = useNavigate();
@@ -18,20 +15,18 @@ const MakeSchedule = () => {
 
     const [subTasks, setSubTasks] = useState([]);
 
-    const [isLoading, setIsLoading] = useState(false); // Controls the loader visibility
+    const [isLoading, setIsLoading] = useState(false);
     const [responseMessage, setResponseMessage] = useState('');
     const [messageType, setMessageType] = useState('');
 
     const API_BASE_URL = import.meta.env.VITE_SIMP_API_POINT;
 
-    // Add first sub-task when component mounts
     useEffect(() => {
         if (subTasks.length === 0) {
             addSubTask();
         }
-    }, []); // Empty dependency array means this runs once on mount
+    }, []);
 
-    // Helper to convert duration object to total seconds for CLIENT-SIDE validation
     const convertDurationToSeconds = (durationObj) => {
         const hh = parseInt(durationObj.hh, 10);
         const mm = parseInt(durationObj.mm, 10);
@@ -42,87 +37,115 @@ const MakeSchedule = () => {
         const seconds = isNaN(ss) ? 0 : ss;
 
         if (minutes < 0 || minutes > 59 || seconds < 0 || seconds > 59) {
-            return null; // Invalid MM or SS
+            return null;
         }
 
         return (hours * 3600) + (minutes * 60) + seconds;
     };
 
-    // --- Event Handlers for Input Changes ---
-    // handleLogout is removed as Nav component is not present.
-    // const handleLogout = () => {
-    //     console.log("DEBUG(MakeSchedule): Attempting to log out.");
-    //     localStorage.removeItem('jwtToken');
-    //     navigate('/login');
-    // };
+    const validateInput = (input, type) => {
+        const regex = {
+            name: /^[a-zA-Z0-9\s]*$/,
+            time: /^\d*$/,
+        };
+
+        if (type === 'name') {
+            return regex.name.test(input);
+        } else if (type === 'time') {
+            return regex.time.test(input);
+        }
+        return false;
+    };
 
     const handleMainTaskNameChange = (e) => {
-        setMainTask((prevTask) => ({
-            ...prevTask,
-            name: e.target.value,
-        }));
-        setResponseMessage('');
+        const inputValue = e.target.value;
+        if (validateInput(inputValue, 'name')) {
+            setMainTask((prevTask) => ({
+                ...prevTask,
+                name: inputValue,
+            }));
+            setResponseMessage('');
+        } else {
+            setResponseMessage('Invalid input. Only alphabets, numbers, and spaces are allowed.');
+            setMessageType('danger');
+        }
     };
 
     const handleMainTaskDurationChange = (e) => {
         const { name, value } = e.target;
-        setMainTask((prevTask) => {
-            const parsedValue = value === '' ? '' : parseInt(value, 10);
-            let updatedValue = value;
+        if (validateInput(value, 'time')) {
+            setMainTask((prevTask) => {
+                const parsedValue = value === '' ? '' : parseInt(value, 10);
+                let updatedValue = value;
 
-            if (!isNaN(parsedValue) && value !== '') {
-                if (name === 'mm' || name === 'ss') {
-                    updatedValue = String(Math.max(0, Math.min(59, parsedValue))).padStart(2, '0');
-                } else if (name === 'hh') {
-                    updatedValue = String(Math.max(0, parsedValue)).padStart(2, '0');
+                if (!isNaN(parsedValue) && value !== '') {
+                    if (name === 'mm' || name === 'ss') {
+                        updatedValue = String(Math.max(0, Math.min(59, parsedValue))).padStart(2, '0');
+                    } else if (name === 'hh') {
+                        updatedValue = String(Math.max(0, parsedValue)).padStart(2, '0');
+                    }
+                } else if (value !== '') {
+                    updatedValue = '';
                 }
-            } else if (value !== '') {
-                updatedValue = '';
-            }
 
-            return {
-                ...prevTask,
-                totalDuration: {
-                    ...prevTask.totalDuration,
-                    [name]: updatedValue,
-                },
-            };
-        });
-        setResponseMessage('');
+                return {
+                    ...prevTask,
+                    totalDuration: {
+                        ...prevTask.totalDuration,
+                        [name]: updatedValue,
+                    },
+                };
+            });
+            setResponseMessage('');
+        } else {
+            setResponseMessage('Invalid input. Only numbers are allowed.');
+            setMessageType('danger');
+        }
     };
 
     const handleSubTaskNameChange = (index, e) => {
-        const newSubTasks = [...subTasks];
-        newSubTasks[index].name = e.target.value;
-        setSubTasks(newSubTasks);
-        setResponseMessage('');
+        const inputValue = e.target.value;
+        if (validateInput(inputValue, 'name')) {
+            const newSubTasks = [...subTasks];
+            newSubTasks[index].name = inputValue;
+            setSubTasks(newSubTasks);
+            setResponseMessage('');
+        } else {
+            setResponseMessage('Invalid input. Only alphabets, numbers, and spaces are allowed.');
+            setMessageType('danger');
+        }
     };
 
     const handleSubTaskDurationChange = (index, e) => {
         const { name, value } = e.target;
-        setSubTasks((prevSubTasks) => {
-            const newSubTasks = [...prevSubTasks];
-            const currentDuration = newSubTasks[index].duration;
-            const parsedValue = value === '' ? '' : parseInt(value, 10);
-            let updatedValue = value;
+        if (validateInput(value, 'time')) {
+            setSubTasks((prevSubTasks) => {
+                const newSubTasks = [...prevSubTasks];
+                const currentDuration = newSubTasks[index].duration;
+                const parsedValue = value === '' ? '' : parseInt(value, 10);
+                let updatedValue = value;
 
-            if (!isNaN(parsedValue) && value !== '') {
-                if (name === 'mm' || name === 'ss') {
-                    updatedValue = String(Math.max(0, Math.min(59, parsedValue))).padStart(2, '0');
-                } else if (name === 'hh') {
-                    updatedValue = String(Math.max(0, parsedValue)).padStart(2, '0');
+                if (!isNaN(parsedValue) && value !== '') {
+                    if (name === 'mm' || name === 'ss') {
+                        updatedValue = String(Math.max(0, Math.min(59, parsedValue))).padStart(2, '0');
+                    } else if (name === 'hh') {
+                        updatedValue = String(Math.max(0, parsedValue)).padStart(2, '0');
+                    }
+                } else if (value !== '') {
+                    updatedValue = '';
                 }
-            } else if (value !== '') {
-                updatedValue = '';
-            }
 
-            newSubTasks[index].duration = {
-                ...currentDuration,
-                [name]: updatedValue,
-            };
-            return newSubTasks;
-        });
-        setResponseMessage('');
+                newSubTasks[index].duration = {
+                    ...currentDuration,
+                    [name]: updatedValue,
+                };
+                return newSubTasks;
+            });
+            setResponseMessage('');
+        } else {
+            setResponseMessage('Invalid input. Only numbers are allowed.');
+            setMessageType('danger');
+        }
     };
 
     const addSubTask = () => {
@@ -134,35 +157,23 @@ const MakeSchedule = () => {
     };
 
     const removeSubTask = (index) => {
-        if (subTasks.length === 1) {
-            setResponseMessage('You must have at least one sub-task.');
-            setMessageType('danger');
-            return;
-        }
-        setSubTasks((prevSubTasks) => prevSubTasks.filter((_, i) => i !== index));
-        setResponseMessage('');
-    };
-
-    // --- Core API Submission Logic ---
+    if (subTasks.length === 1) {
+        setResponseMessage('You must have at least one sub-task.');
+        setMessageType('danger');
+        return;
+    }
+    setSubTasks((prevSubTasks) => prevSubTasks.filter((_, i) => i !== index));
+    setResponseMessage('');
+};
     const sendSaveScheduleToBackend = async (redirectAfterSave = false) => {
-        setIsLoading(true); // Show loader
+        setIsLoading(true);
         setResponseMessage('');
         setMessageType('');
 
-        const token = localStorage.getItem('jwtToken');
-        if (!token) {
-            setResponseMessage('Authentication required. Please log in.');
-            setMessageType('danger');
-            setIsLoading(false); // Hide loader
-            navigate('/login');
-            return;
-        }
-
-        // --- Client-Side Validation ---
         if (!mainTask.name.trim()) {
             setResponseMessage('Main task name is required.');
             setMessageType('danger');
-            setIsLoading(false); // Hide loader
+            setIsLoading(false);
             return;
         }
 
@@ -170,14 +181,14 @@ const MakeSchedule = () => {
         if (totalDurationSecondsForValidation === null) {
             setResponseMessage('Main task duration has invalid minutes or seconds (0-59 allowed for MM/SS).');
             setMessageType('danger');
-            setIsLoading(false); // Hide loader
+            setIsLoading(false);
             return;
         }
         if (mainTask.name.trim() && totalDurationSecondsForValidation === 0 &&
             (mainTask.totalDuration.hh === '' && mainTask.totalDuration.mm === '' && mainTask.totalDuration.ss === '')) {
             setResponseMessage('Main task with a name requires a total duration (HH:MM:SS).');
             setMessageType('danger');
-            setIsLoading(false); // Hide loader
+            setIsLoading(false);
             return;
         }
 
@@ -188,7 +199,7 @@ const MakeSchedule = () => {
             if (!sub.name.trim()) {
                 setResponseMessage('All sub-task names are required.');
                 setMessageType('danger');
-                setIsLoading(false); // Hide loader
+                setIsLoading(false);
                 return;
             }
 
@@ -196,14 +207,14 @@ const MakeSchedule = () => {
             if (subTaskDurationSecondsForValidation === null) {
                 setResponseMessage(`Sub-task "${sub.name}" has invalid minutes or seconds (0-59 allowed for MM/SS).`);
                 setMessageType('danger');
-                setIsLoading(false); // Hide loader
+                setIsLoading(false);
                 return;
             }
             if (sub.name.trim() && subTaskDurationSecondsForValidation === 0 &&
                 (sub.duration.hh === '' && sub.duration.mm === '' && sub.duration.ss === '')) {
                 setResponseMessage(`Sub-task "${sub.name}" requires an allocated time (HH:MM:SS).`);
                 setMessageType('danger');
-                setIsLoading(false); // Hide loader
+                setIsLoading(false);
                 return;
             }
 
@@ -218,7 +229,7 @@ const MakeSchedule = () => {
         if (sumOfSubTaskDurations > totalDurationSecondsForValidation) {
             setResponseMessage('The total duration of all sub-tasks cannot exceed the main schedule\'s total duration.');
             setMessageType('danger');
-            setIsLoading(false); // Hide loader
+            setIsLoading(false);
             return;
         }
 
@@ -231,16 +242,13 @@ const MakeSchedule = () => {
         };
 
         try {
-            // NOTE: API endpoint is still /api as per your provided code.
-            // If it should be /schedules, you would need to manually change this here
-            // and ensure your backend's server.js maps /schedules to ScheduleRoutes.
-            const response = await fetch(`${API_BASE_URL}/api`, {
+            const response = await fetch(`${API_BASE_URL}/api/schedules`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify(payload),
+                credentials: 'include',
             });
 
             const data = await response.json();
@@ -253,7 +261,7 @@ const MakeSchedule = () => {
                 if (redirectAfterSave) {
                     setTimeout(() => {
                         navigate('/saved-schedules');
-                    }, 1500);
+                    }, 2000);
                 } else {
                     setMainTask({ name: '', totalDuration: { hh: '', mm: '', ss: '' } });
                     setSubTasks([]);
@@ -264,7 +272,6 @@ const MakeSchedule = () => {
                 console.error("DEBUG(MakeSchedule): Schedule save failed:", response.status, data);
 
                 if (response.status === 401 || response.status === 403) {
-                    localStorage.removeItem('jwtToken');
                     navigate('/login');
                 }
             }
@@ -273,7 +280,7 @@ const MakeSchedule = () => {
             setResponseMessage('Network error or server unavailable. Please try again.');
             setMessageType('danger');
         } finally {
-            setIsLoading(false); // Hide loader regardless of success or failure
+            setIsLoading(false);
         }
     };
 
@@ -289,12 +296,10 @@ const MakeSchedule = () => {
 
     return (
         <div>
-            {/* Conditional Full-Screen Loader: Renders only when isLoading is true */}
-            {isLoading && <Loader />} 
-
+            {isLoading && <Loader />}
             <div className="make-schedule-page-content">
                 <div className="form-container">
-                    <h2 className="form-heading">Create Schedule</h2>
+                    <h2 className="form-heading">Create Your Time Schedule</h2>
 
                     {responseMessage && (
                         <Alert variant={messageType} className="mb-3 text-center">
@@ -304,10 +309,9 @@ const MakeSchedule = () => {
 
                     <form className="main-schedule-form">
                         <div className="form-scrollable-area">
-                            {/* Main Task Name and Total Duration */}
                             <div className="input-group-row">
                                 <div className="input-field-half">
-                                    <label htmlFor="taskName">Task Name / Purpose:</label>
+                                    <label htmlFor="taskName"> Purpose / Title of the Timer:</label>
                                     <input
                                         type="text"
                                         id="taskName"
@@ -334,7 +338,6 @@ const MakeSchedule = () => {
 
                             <hr className="bold-hr" />
 
-                            {/* Sub-Tasks Section */}
                             <h3 className="sub-heading">Breakdown of Units:</h3>
                             {subTasks.map((subTask, index) => (
                                 <div key={index} className="sub-task-item">
@@ -379,7 +382,7 @@ const MakeSchedule = () => {
                             <button type="button" onClick={addSubTask} className="plus-button" title="Add another sub-task" disabled={isLoading}>
                                 +
                             </button>
-                        </div> {/* END of form-scrollable-area */}
+                        </div>
 
                         <hr className="bold-hr" />
                         <div className="button-group">
@@ -390,7 +393,7 @@ const MakeSchedule = () => {
                                 disabled={isLoading}
                             >
                                 {isLoading ? (
-                                    'Saving...' // Display text while loading, as Loader is an overlay
+                                    'Saving...'
                                 ) : (
                                     'Save Schedule'
                                 )}
@@ -402,7 +405,7 @@ const MakeSchedule = () => {
                                 disabled={isLoading}
                             >
                                 {isLoading ? (
-                                    'Starting...' // Display text while loading
+                                    'Starting...'
                                 ) : (
                                     'Start Schedule Now'
                                 )}

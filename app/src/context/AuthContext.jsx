@@ -68,11 +68,10 @@ export const AuthProvider = ({ children }) => {
   }, [location.pathname]);
 
   useEffect(() => {
-  if (!isAuthenticated && !publicAccessiblePaths.includes(location.pathname)) {
-    console.log('Redirecting to login page');
+  if (!isLoading && !isAuthenticated && !publicAccessiblePaths.includes(location.pathname)) {
     navigate('/login');
   }
-}, [isAuthenticated, location.pathname, navigate]);
+}, [isAuthenticated, isLoading, location.pathname, navigate]);
 
   const contextValue = {
     isAuthenticated,
